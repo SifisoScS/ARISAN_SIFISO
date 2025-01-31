@@ -1,0 +1,5 @@
+crewai         # Multi-agent framework
+numpy          # Numerical processing
+pandas         # Data handling
+openai         # LLM-based AI interactions
+fastapi        # API development (for later phases)
