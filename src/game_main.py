@@ -1,8 +1,9 @@
-from game.card_deck import Deck
+from game.game_manager import GameManager
 
-# Initialize deck and deal one card for testing
-deck = Deck()
-test_card = deck.deal(1)[0]
+# Initialize Game Manager
+game_manager = GameManager()
 
-print("\n🔹 Testing Card Handling 🔹")
-print(f"Dealt card: {test_card}")
+# Deal cards to AI players
+game_manager.deal_cards()
+game_manager.display_scores()
+game_manager.determine_winner()
