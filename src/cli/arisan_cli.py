@@ -1,32 +1,27 @@
-import click
-from agents.task_manager import TaskManager
+import sys
+from game.game_manager import GameManager
 
-task_manager = TaskManager()
+def main():
+    """CLI interface for the ARISAN SIFISO card game."""
+    print("\n🎴 Welcome to the ARISAN SIFISO Card Game 🎴")
+    print("1. Play against AI")
+    print("2. Watch AI battle each other")
+    choice = input("Enter your choice (1 or 2): ").strip()
 
-@click.group()
-def cli():
-    """ARISAN SIFISO Command Line Interface."""
-    pass
+    if choice == "1":
+        game_manager = GameManager(include_human=True)
+    else:
+        game_manager = GameManager(include_human=False)
 
-@cli.command()
-@click.argument("expression")
-def calculate(expression):
-    """Perform a mathematical calculation using the Planning Agent."""
-    result = task_manager.execute_workflow("math", expression)
-    click.echo(f"Calculation Result: {result}")
+    print("\n🃏 Dealing cards...\n")
+    game_manager.deal_cards()
 
-@cli.command()
-@click.argument("text")
-def extract(text):
-    """Extract numbers from text using the Data Processing Agent."""
-    result = task_manager.execute_workflow("data_processing", text)
-    click.echo(f"Extracted Numbers: {result}")
+    print("\n🔄 Swapping phase...\n")
+    game_manager.allow_swaps()
 
-@cli.command()
-@click.argument("expression")
-def multi_agent(expression):
-    """Run a full multi-agent task workflow."""
-    task_manager.run_interaction(expression)
+    print("\n🔹 Final Scores & Winner 🔹\n")
+    game_manager.display_scores()
+    game_manager.determine_winner()
 
 if __name__ == "__main__":
-    cli()
+    main()
