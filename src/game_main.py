@@ -1,4 +1,8 @@
 from game.game_manager import GameManager
+from cli.arisan_cli import main
+
+if __name__ == "__main__":
+    main()
 
 # Initialize Game Manager
 game_manager = GameManager()
