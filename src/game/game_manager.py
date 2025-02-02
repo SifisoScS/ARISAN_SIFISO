@@ -1,6 +1,6 @@
+import random
 from game.card_deck import Deck
 from agents.card_player_agent import CardPlayerAgent
-import random
 
 class GameManager:
     """Manages the multiplayer card game, including dealing and scoring."""
@@ -18,9 +18,15 @@ class GameManager:
         for player in self.players:
             player.receive_cards(self.deck.deal(5))
 
+    def allow_swaps(self):
+        """Allows players to swap one card."""
+        print("\n🔄 AI Players Swapping Cards 🔄\n")
+        for player in self.players:
+            player.swap_card(self.deck)
+
     def display_scores(self):
         """Displays each player's hand and score."""
-        print("\n🔹 GameManager: Players & Scores 🔹\n")
+        print("\n🔹 GameManager: Players & Scores After Swaps 🔹\n")
         for player in self.players:
             print(player)
 
@@ -48,5 +54,6 @@ class GameManager:
 if __name__ == "__main__":
     game_manager = GameManager()
     game_manager.deal_cards()
+    game_manager.allow_swaps()
     game_manager.display_scores()
     game_manager.determine_winner()
