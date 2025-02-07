@@ -19,7 +19,7 @@ def main():
         print_colored("2. Watch AI battle each other", Fore.YELLOW)
         print_colored("3. Exit", Fore.RED)
 
-        choice = input(Fore.WHITE + "Enter your choice (1, 2, or 3): ").strip()
+        choice = input(f"{Fore.WHITE}Enter your choice (1, 2, or 3): ").strip()
 
         if choice == "3":
             print_colored("\n👋 Thanks for playing! Goodbye!\n", Fore.MAGENTA)
