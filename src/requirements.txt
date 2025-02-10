@@ -1,5 +1,7 @@
-crewai         # Multi-agent framework
-numpy          # Numerical processing
-pandas         # Data handling
-openai         # LLM-based AI interactions
-fastapi        # API development (for later phases)
+# Backend dependencies
+Flask==3.1.0              # Flask backend server
+Flask-Cors==5.0.0         # Allows Vue.js frontend to talk to Flask
+crewai==0.100.1           # Multi-agent framework
+numpy==2.2.1              # Numerical computations
+pandas==2.2.3             # Data handling
+openai==1.60.2            # AI interactions
