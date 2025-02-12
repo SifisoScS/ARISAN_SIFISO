@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARISAN SIFISO - FastUI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white flex items-center justify-center h-screen">
+
+    <div class="text-center">
+        <h1 class="text-4xl font-bold">🎴 ARISAN SIFISO 🎴</h1>
+        <p class="mt-4">A lightweight FastUI-powered card game interface</p>
+
+        <button 
+            onclick="startGame()"
+            class="mt-6 px-6 py-3 bg-blue-500 hover:bg-blue-700 text-white font-semibold rounded-lg">
+            Start Game
+        </button>
+
+        <div id="game-result" class="mt-4 text-lg"></div>
+    </div>
+
+    <script>
+        function startGame() {
+            fetch("/start_game", { method: "POST" })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("game-result").innerText = data.message;
+                })
+                .catch(error => console.error("Error:", error));
+        }
+    </script>
+
+</body>
+</html>
