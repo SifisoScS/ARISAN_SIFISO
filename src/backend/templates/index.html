@@ -3,34 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ARISAN SIFISO - FastUI</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>ARISAN SIFISO</title>
 </head>
-<body class="bg-gray-900 text-white flex items-center justify-center h-screen">
+<body>
+    <h1>🎴 ARISAN SIFISO 🎴</h1>
+    <p>A lightweight FastUI-powered card game interface</p>
 
-    <div class="text-center">
-        <h1 class="text-4xl font-bold">🎴 ARISAN SIFISO 🎴</h1>
-        <p class="mt-4">A lightweight FastUI-powered card game interface</p>
+    <button onclick="startGame()">Start Game</button>
+    <button onclick="resetGame()">Reset Game</button>
+    <button onclick="fetchPlayers()">View Players</button>
+    <button onclick="fetchLeaderboard()">Leaderboard</button>
 
-        <button 
-            onclick="startGame()"
-            class="mt-6 px-6 py-3 bg-blue-500 hover:bg-blue-700 text-white font-semibold rounded-lg">
-            Start Game
-        </button>
-
-        <div id="game-result" class="mt-4 text-lg"></div>
-    </div>
+    <div id="game-output"></div>
 
     <script>
         function startGame() {
-            fetch("/start_game", { method: "POST" })
+            fetch('/start_game', { method: 'POST' })
                 .then(response => response.json())
                 .then(data => {
-                    document.getElementById("game-result").innerText = data.message;
+                    document.getElementById("game-output").innerHTML = `<p>${data.message}</p>`;
+                })
+                .catch(error => console.error("Error:", error));
+        }
+
+        function resetGame() {
+            fetch('/reset_game', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("game-output").innerHTML = `<p>${data.message}</p>`;
+                })
+                .catch(error => console.error("Error:", error));
+        }
+
+        function fetchPlayers() {
+            fetch('/view_players')
+                .then(response => response.json())
+                .then(data => {
+                    let output = "<h3>Players:</h3><ul>";
+                    data.players.forEach(player => {
+                        output += `<li>${player.name} (Strategy: ${player.strategy}) - Score: ${player.score}, Suit Score: ${player.suit_score}</li>`;
+                    });
+                    output += "</ul>";
+                    document.getElementById("game-output").innerHTML = output;
+                })
+                .catch(error => console.error("Error:", error));
+        }
+
+        function fetchLeaderboard() {
+            fetch('/leaderboard')
+                .then(response => response.json())
+                .then(data => {
+                    let output = "<h3>Leaderboard:</h3><ul>";
+                    data.leaderboard.forEach(entry => {
+                        output += `<li>${entry.name} - Wins: ${entry.wins}</li>`;
+                    });
+                    output += "</ul>";
+                    document.getElementById("game-output").innerHTML = output;
                 })
                 .catch(error => console.error("Error:", error));
         }
     </script>
-
 </body>
 </html>
