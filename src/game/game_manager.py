@@ -7,7 +7,7 @@ from agents.card_player_agent import CardPlayerAgent
 LEADERBOARD_FILE = "leaderboard.json"
 
 class GameManager:
-    """Manages the multiplayer card game, including AI and human players."""
+    """Manages the multiplayer card game, including AI players and leaderboard tracking."""
 
     def __init__(self, num_players=5, include_human=False):
         self.deck = Deck()
@@ -19,7 +19,7 @@ class GameManager:
             strategy = random.choice(strategies)
             self.players.append(CardPlayerAgent(f"Player {i+1}", strategy))
 
-        self.leaderboard = self.load_leaderboard()  
+        self.leaderboard = self.load_leaderboard()  # Load or create leaderboard
 
     def deal_cards(self):
         """Deals 5 cards to each player."""
@@ -30,7 +30,7 @@ class GameManager:
         """Allows AI players to swap cards based on their strategy."""
         print("\n🔄 AI Players Swapping Cards 🔄\n")
         for player in self.players:
-            player.swap_card(self.deck)  
+            player.swap_card(self.deck)
 
     def display_scores(self):
         """Displays each player's hand and score."""
@@ -48,6 +48,7 @@ class GameManager:
             print(f"\n🏆 Winner: {winner.name} with Score: {winner.calculate_score()}\n")
             self.update_leaderboard(winner.name)
         else:
+            # Handle Tie-Breaker by Suit Score
             highest_suit_score = max(player.calculate_suit_score() for player in tied_players)
             final_winners = [player for player in tied_players if player.calculate_suit_score() == highest_suit_score]
 
@@ -59,16 +60,20 @@ class GameManager:
                 print("\n⚖️ The game is a tie between:")
                 for player in final_winners:
                     print(f"{player.name} - Score: {player.calculate_score()}, Suit Score: {player.calculate_suit_score()}")
-                return  
+                return  # No update to leaderboard if tied after tie-breaker
 
-        self.save_leaderboard()  
+        self.save_leaderboard()  # Save leaderboard after updating
 
     def load_leaderboard(self):
-        """Loads the leaderboard from a file."""
-        if os.path.exists(LEADERBOARD_FILE):
-            with open(LEADERBOARD_FILE, "r") as file:
+        """Loads the leaderboard from a file or creates a new one if missing."""
+        if not os.path.exists(LEADERBOARD_FILE):
+            return {}  # Return empty leaderboard if file doesn't exist
+
+        with open(LEADERBOARD_FILE, "r") as file:
+            try:
                 return json.load(file)
-        return {}
+            except json.JSONDecodeError:
+                return {}  # Reset leaderboard if file is corrupted
 
     def save_leaderboard(self):
         """Saves the leaderboard to a file."""
@@ -88,3 +93,8 @@ class GameManager:
         sorted_leaderboard = sorted(self.leaderboard.items(), key=lambda x: x[1], reverse=True)
         for rank, (player, wins) in enumerate(sorted_leaderboard, start=1):
             print(f"{rank}. {player} - {wins} wins")
+
+    def get_leaderboard(self):
+        """Returns a **sorted global leaderboard** for all past games."""
+        sorted_leaderboard = sorted(self.leaderboard.items(), key=lambda x: x[1], reverse=True)
+        return [{"name": player, "wins": wins} for player, wins in sorted_leaderboard]
