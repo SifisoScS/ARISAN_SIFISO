@@ -3,54 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ARISAN SIFISO - Card Game</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <title>Arisan Sifiso</title>
+    <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
-    <div class="container">
-        <h1 class="title">🎴 ARISAN SIFISO 🎴</h1>
-        <p class="subtitle">A lightweight card game interface</p>
 
-        <div class="button-group">
+    <!-- Sticky Header -->
+    <header>
+        <h1>
+            <img src="/static/card_icon.png" alt="Card Icon"> 
+            ARISAN SIFISO 
+            <img src="/static/card_icon.png" alt="Card Icon">
+        </h1>
+        <p>A lightweight card game interface</p>
+    </header>
+
+    <!-- Game Interface -->
+    <main>
+        <div class="button-container">
             <button onclick="startGame()">Start Game</button>
             <button onclick="resetGame()">Reset Game</button>
             <button onclick="viewPlayers()">View Players</button>
             <button onclick="showLeaderboard()">Leaderboard</button>
         </div>
+        
+        <!-- Success Message -->
+        <p id="success-message" class="hidden">Game reset successfully!</p>
 
-        <div id="game-results" class="results-container">
-            <p>Game results will appear here...</p>
-        </div>
-    </div>
+        <!-- Game Results -->
+        <div id="game-results" class="results-container"></div>
 
-    <script>
-        function startGame() {
-            fetch('/start_game', { method: 'POST' })
-                .then(response => response.json())
-                .then(data => document.getElementById('game-results').innerHTML = data.message)
-                .catch(error => console.error("Error:", error));
-        }
+        <!-- Loader -->
+        <div id="loader" class="loader"></div>
+    </main>
 
-        function resetGame() {
-            fetch('/reset_game', { method: 'POST' })
-                .then(response => response.json())
-                .then(data => alert(data.message))
-                .catch(error => console.error("Error:", error));
-        }
-
-        function viewPlayers() {
-            fetch('/view_players')
-                .then(response => response.json())
-                .then(data => alert(JSON.stringify(data, null, 2)))
-                .catch(error => console.error("Error:", error));
-        }
-
-        function showLeaderboard() {
-            fetch('/leaderboard')
-                .then(response => response.json())
-                .then(data => alert(JSON.stringify(data, null, 2)))
-                .catch(error => console.error("Error:", error));
-        }
-    </script>
+    <script src="/static/script.js"></script>
 </body>
 </html>
