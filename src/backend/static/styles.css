@@ -1,62 +1,130 @@
-/* General Page Styling */
+/* General Styles */
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f8f9fa;
-    text-align: center;
-    margin: 0;
-    padding: 20px;
-}
-
-/* Container */
-.container {
-    max-width: 600px;
-    margin: auto;
-    padding: 20px;
-    background: white;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
-}
-
-/* Title and Subtitle */
-.title {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f9f9f9;
     color: #333;
-    font-size: 26px;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
 }
 
-.subtitle {
-    color: #555;
-    font-size: 16px;
-    margin-bottom: 20px;
+/* Sticky Header */
+header {
+    text-align: center;
+    padding: 15px;
+    background-color: #2c3e50;
+    color: white;
+    width: 100%;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-/* Button Group */
-.button-group {
+header h1 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2em;
+}
+
+header h1 img {
+    width: 30px;
+    height: 30px;
+    margin: 0 10px;
+}
+
+/* Main Container */
+main {
+    width: 80%;
+    max-width: 800px;
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
     margin-top: 20px;
 }
 
-.button-group button {
-    padding: 10px 15px;
-    margin: 5px;
-    border: none;
-    cursor: pointer;
-    font-size: 16px;
-    border-radius: 5px;
-    transition: background 0.3s;
+/* Button Styles */
+.button-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
 }
 
-/* Button Colors */
 button {
-    background: #007bff;
+    padding: 10px 15px;
+    font-size: 1em;
+    border: none;
+    border-radius: 5px;
+    background-color: #3498db;
     color: white;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 button:hover {
-    background: #0056b3;
+    background-color: #2980b9;
+    transform: scale(1.05);
+}
+
+button:active {
+    transform: scale(0.95);
+}
+
+/* Success Message */
+#success-message {
+    font-size: 1.2em;
+    color: #27ae60;
+    margin-top: 20px;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+
+#success-message.show {
+    opacity: 1;
+}
+
+/* Game Results Fade-in */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .results-container {
     margin-top: 20px;
-    padding: 10px;
+    padding: 15px;
     background: #e9ecef;
     border-radius: 5px;
+    font-size: 18px;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.results-container.show {
+    opacity: 1;
+    animation: fadeIn 0.6s ease-in-out;
+}
+
+/* Loader Animation */
+.loader {
+    display: none;
+    margin: 10px auto;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
