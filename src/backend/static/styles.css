@@ -69,9 +69,14 @@ button {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+/* Add hover effects for buttons */
+button {
+    transition: transform 0.2s ease, background-color 0.3s ease;
+}
+
 button:hover {
-    background-color: #2980b9;
-    transform: scale(1.05);
+    transform: scale(1.1);
+    background-color: #1f78b4;
 }
 
 button:active {
@@ -127,4 +132,36 @@ button:active {
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+/* Additional Styles for Table and List */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+table th, table td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+table th {
+    background-color: #3498db;
+    color: white;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+ul li {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+ul li:last-child {
+    border-bottom: none;
 }
