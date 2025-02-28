@@ -15,9 +15,7 @@ def home():
 
 @app.route('/start_game', methods=['POST'])
 def start_game():
-    game_manager.deal_cards()
-    game_manager.allow_swaps()
-    game_manager.determine_winner()
+    game_manager.start_game()  # Start a new game
     return jsonify({"message": "Game has started! Check the results section."})
 
 @app.route('/reset_game', methods=['POST'])
@@ -28,12 +26,14 @@ def reset_game():
 
 @app.route('/view_players', methods=['GET'])
 def view_players():
-    players = [{"name": p.name, "strategy": p.strategy} for p in game_manager.players]
-    return jsonify(players)
+    players = game_manager.players  # Fetch players from the GameManager instance
+    player_data = [{"name": player.name, "score": player.calculate_score()} for player in players]
+    return jsonify(player_data)
 
 @app.route('/leaderboard', methods=['GET'])
 def leaderboard():
-    return jsonify({"leaderboard": game_manager.get_leaderboard()})
+    leaderboard_data = game_manager.get_leaderboard()  # Fetch leaderboard from the GameManager instance
+    return jsonify(leaderboard_data)
 
 if __name__ == '__main__':
     app.run(debug=True)

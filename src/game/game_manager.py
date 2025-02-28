@@ -7,7 +7,11 @@ from agents.card_player_agent import CardPlayerAgent
 LEADERBOARD_FILE = "leaderboard.json"
 
 class GameManager:
-    """Manages the multiplayer card game, including AI players and leaderboard tracking."""
+    def start_game(self):
+        """Starts a new game by dealing cards, allowing swaps, and determining the winner."""
+        self.deal_cards()
+        self.allow_swaps()
+        self.determine_winner()
 
     def __init__(self, num_players=5, include_human=False):
         self.deck = Deck()
