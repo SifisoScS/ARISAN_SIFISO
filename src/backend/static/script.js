@@ -1,3 +1,93 @@
+// Function to toggle the sidebar
+function toggleSidebar() {
+    var sidebar = document.querySelector('.sidebar');
+    sidebar.classList.toggle('active');
+}
+
+// Function to update the game state
+function updateGameState(state) {
+    const gameStateElement = document.getElementById('game-state');
+    gameStateElement.textContent = state;
+}
+
+// Function to update player hands
+function updatePlayerHands(players) {
+    const playerHandsElement = document.getElementById('player-hands');
+    playerHandsElement.innerHTML = players.map(player => `
+        <div>
+            <strong>${player.name}:</strong>
+            ${player.hand.map(() => `<div class="card-icon"></div>`).join('')}
+        </div>
+    `).join('');
+}
+
+// Function to update the leaderboard preview
+function updateLeaderboardPreview(leaderboard) {
+    const leaderboardPreviewElement = document.getElementById('leaderboard-preview');
+    if (!leaderboard || leaderboard.length === 0) {
+        leaderboardPreviewElement.innerHTML = `<div>No leaderboard entries available</div>`;
+        return;
+    }
+    const maxEntries = 3;
+    let displayedEntries = leaderboard.slice(0, maxEntries).map((entry, index) => `
+        <div>
+            <strong>${index + 1}. ${entry.name}:</strong> ${entry.score}
+        </div>
+    `);
+    if (leaderboard.length < maxEntries) {
+        displayedEntries.push(`<div>Only ${leaderboard.length} entr${leaderboard.length === 1 ? 'y' : 'ies'} available</div>`);
+    }
+    leaderboardPreviewElement.innerHTML = displayedEntries.join('');
+}
+
+// Function to log recent actions
+function logRecentAction(action) {
+    const recentActionsElement = document.getElementById('recent-actions');
+    const actionElement = document.createElement('div');
+    actionElement.textContent = action;
+    recentActionsElement.appendChild(actionElement);
+    recentActionsElement.scrollTop = recentActionsElement.scrollHeight; // Auto-scroll to the latest action
+}
+
+// Function to show the loader
+function showLoader() {
+    document.getElementById('loader').style.display = 'block';
+}
+
+// Function to hide the loader
+function hideLoader() {
+    document.getElementById('loader').style.display = 'none';
+}
+
+// Function to start the game
+function startGame() {
+    showLoader();
+    fetch('/start_game', { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('game-results').innerHTML = data.message;
+            document.getElementById('game-results').classList.add('show');
+        })
+        .catch(error => console.error("Error:", error))
+        .finally(() => hideLoader());
+}
+
+// Function to reset the game
+function resetGame() {
+    showLoader();
+    fetch('/reset_game', { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById("success-message").classList.add("show");
+            setTimeout(() => {
+                document.getElementById("success-message").classList.remove("show");
+            }, 2000);
+            document.getElementById('game-results').classList.remove('show');
+        })
+        .catch(error => console.error("Error:", error))
+        .finally(() => hideLoader());
+}
+
 // Function to fetch and display players
 async function viewPlayers() {
     try {
@@ -69,79 +159,4 @@ async function showLeaderboard() {
     } finally {
         hideLoader();
     }
-}
-
-// Function to start the game
-function startGame() {
-    showLoader();
-    fetch('/start_game', { method: 'POST' })
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('game-results').innerHTML = data.message;
-            document.getElementById('game-results').classList.add('show');
-        })
-        .catch(error => console.error("Error:", error))
-        .finally(() => hideLoader());
-}
-
-// Function to reset the game
-function resetGame() {
-    showLoader();
-    fetch('/reset_game', { method: 'POST' })
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById("success-message").classList.add("show");
-            setTimeout(() => {
-                document.getElementById("success-message").classList.remove("show");
-            }, 2000);
-            document.getElementById('game-results').classList.remove('show');
-        })
-        .catch(error => console.error("Error:", error))
-        .finally(() => hideLoader());
-}
-
-// Function to show the loader
-function showLoader() {
-    document.getElementById('loader').style.display = 'block';
-}
-
-// Function to hide the loader
-function hideLoader() {
-    document.getElementById('loader').style.display = 'none';
-}
-
-// Function to update the game state
-function updateGameState(state) {
-    const gameStateElement = document.getElementById('game-state');
-    gameStateElement.textContent = state;
-}
-
-// Function to update player hands
-function updatePlayerHands(players) {
-    const playerHandsElement = document.getElementById('player-hands');
-    playerHandsElement.innerHTML = players.map(player => `
-        <div>
-            <strong>${player.name}:</strong>
-            ${player.hand.map(() => `<div class="card-icon"></div>`).join('')}
-        </div>
-    `).join('');
-}
-
-// Function to update the leaderboard preview
-function updateLeaderboardPreview(leaderboard) {
-    const leaderboardPreviewElement = document.getElementById('leaderboard-preview');
-    leaderboardPreviewElement.innerHTML = leaderboard.slice(0, 3).map((entry, index) => `
-        <div>
-            <strong>${index + 1}. ${entry.name}:</strong> ${entry.score}
-        </div>
-    `).join('');
-}
-
-// Function to log recent actions
-function logRecentAction(action) {
-    const recentActionsElement = document.getElementById('recent-actions');
-    const actionElement = document.createElement('div');
-    actionElement.textContent = action;
-    recentActionsElement.appendChild(actionElement);
-    recentActionsElement.scrollTop = recentActionsElement.scrollHeight; // Auto-scroll to the latest action
 }

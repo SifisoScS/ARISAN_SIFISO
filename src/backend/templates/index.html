@@ -18,6 +18,9 @@
     <p>A lightweight card game interface</p>
 </header>
 
+<!-- Sidebar Navigation Toggle Button for small devices -->
+<button id="sidebar-toggle" class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+
 <!-- Sidebar Navigation -->
 <nav class="sidebar">
     <ul>
@@ -46,26 +49,6 @@
 
     <!-- Loader -->
     <div id="loader" class="loader"></div>
-
-    <!-- Game Status Dashboard -->
-<div class="game-dashboard">
-    <div class="game-state">
-        <h2>Game State</h2>
-        <p id="game-state">Waiting to Start</p>
-    </div>
-    <div class="player-hands">
-        <h2>Player Hands</h2>
-        <div id="player-hands"></div>
-    </div>
-    <div class="leaderboard-preview">
-        <h2>Top Players</h2>
-        <div id="leaderboard-preview"></div>
-    </div>
-    <div class="recent-actions">
-        <h2>Recent Actions</h2>
-        <div id="recent-actions"></div>
-    </div>
-</div>
 </main>
 
 <script src="/static/script.js"></script>
