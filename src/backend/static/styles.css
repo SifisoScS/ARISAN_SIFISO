@@ -15,14 +15,14 @@ body {
 header {
     text-align: center;
     padding: 15px;
-    background: #1E1E2E; /* Dark purple background */
+    background: rgba(30, 30, 46, 0.9); /* Semi-transparent dark purple */
+    backdrop-filter: blur(10px);
     color: #FFFFFF; /* Primary text: white */
     width: 100%;
     position: sticky;
     top: 0;
     z-index: 10;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(10px);
 }
 
 header h1 {
@@ -81,6 +81,44 @@ header p {
     width: 20px;
     height: 20px;
     margin-right: 10px;
+}
+
+/* Sidebar Toggle Button */
+.sidebar-toggle {
+    display: none; /* Hidden by default */
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #FFFFFF; /* White */
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 1001;
+}
+
+/* Responsive adjustments for screen widths 768px and below */
+@media screen and (max-width: 768px) {
+    .sidebar {
+        display: none; /* Hidden by default on small screens */
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 200px;
+        height: 100vh;
+        background-color: rgba(30, 30, 46, 0.9); /* Dark purple with transparency */
+        z-index: 1000;
+        padding: 20px;
+        backdrop-filter: blur(10px);
+    }
+
+    .sidebar.active {
+        display: block; /* Show sidebar when active */
+    }
+
+    .sidebar-toggle {
+        display: block; /* Show toggle button on small screens */
+    }
 }
 
 /* Main Container */
@@ -206,6 +244,17 @@ ul li {
 
 ul li:last-child {
     border-bottom: none;
+}
+
+/* Glowing Animation */
+@keyframes glow {
+    0% { box-shadow: 0 0 5px #FF00FF; }
+    50% { box-shadow: 0 0 20px #00FFFF; }
+    100% { box-shadow: 0 0 5px #FF00FF; }
+}
+
+button.glow {
+    animation: glow 2s infinite;
 }
 
 /* Game Status Dashboard */
