@@ -24,11 +24,11 @@
 <!-- Sidebar Navigation -->
 <nav class="sidebar">
     <ul>
-        <li><a href="#"><img src="/static/icon_home.png" alt="Home Icon">Home</a></li>
-        <li><a href="#" onclick="startGame()"><img src="/static/icon_start.png" alt="Start Icon">Start Game</a></li>
-        <li><a href="#" onclick="resetGame()"><img src="/static/icon_reset.png" alt="Reset Icon">Reset Game</a></li>
-        <li><a href="#" onclick="viewPlayers()"><img src="/static/icon_players.png" alt="Players Icon">View Players</a></li>
-        <li><a href="#" onclick="showLeaderboard()"><img src="/static/icon_leaderboard.png" alt="Leaderboard Icon">Leaderboard</a></li>
+        <li><a href="#">Home</a></li>
+        <li><a href="#" onclick="startGame()">Start Game</a></li>
+        <li><a href="#" onclick="resetGame()">Reset Game</a></li>
+        <li><a href="#" onclick="viewPlayers()">View Players</a></li>
+        <li><a href="#" onclick="showLeaderboard()">Leaderboard</a></li>
     </ul>
 </nav>
 
@@ -46,6 +46,26 @@
 
     <!-- Game Results -->
     <div id="game-results" class="results-container"></div>
+
+    <!-- Game State Dashboard -->
+    <div class="game-dashboard">
+        <div class="game-state">
+            <h2>Game State</h2>
+            <p id="game-state">Waiting to Start</p>
+        </div>
+        <div class="player-hands">
+            <h2>Player Hands</h2>
+            <div id="player-hands"></div>
+        </div>
+        <div class="leaderboard-preview">
+            <h2>Top Players</h2>
+            <div id="leaderboard-preview"></div>
+        </div>
+        <div class="recent-actions">
+            <h2>Recent Actions</h2>
+            <div id="recent-actions"></div>
+        </div>
+    </div>
 
     <!-- Loader -->
     <div id="loader" class="loader"></div>

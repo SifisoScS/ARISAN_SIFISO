@@ -16,7 +16,7 @@ function updatePlayerHands(players) {
     playerHandsElement.innerHTML = players.map(player => `
         <div>
             <strong>${player.name}:</strong>
-            ${player.hand.map(() => `<div class="card-icon"></div>`).join('')}
+            ${player.hand.map(card => `<div class="card-icon">${card}</div>`).join('')}
         </div>
     `).join('');
 }
@@ -67,6 +67,7 @@ function startGame() {
         .then(data => {
             document.getElementById('game-results').innerHTML = data.message;
             document.getElementById('game-results').classList.add('show');
+            setGameActive(true); // Add glowing effect to buttons
         })
         .catch(error => console.error("Error:", error))
         .finally(() => hideLoader());
@@ -83,6 +84,7 @@ function resetGame() {
                 document.getElementById("success-message").classList.remove("show");
             }, 2000);
             document.getElementById('game-results').classList.remove('show');
+            setGameActive(false); // Remove glowing effect from buttons
         })
         .catch(error => console.error("Error:", error))
         .finally(() => hideLoader());
@@ -160,3 +162,48 @@ async function showLeaderboard() {
         hideLoader();
     }
 }
+
+// Function to fetch and display the game state
+async function fetchGameState() {
+    try {
+        console.log('Fetching game state...');
+        const response = await fetch('http://127.0.0.1:5000/game_state'); // Full URL
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const gameState = await response.json();
+        console.log('Game state data:', gameState);
+
+        // Update the game state display
+        updateGameState(gameState.state);
+
+        // Update player hands
+        updatePlayerHands(gameState.players);
+
+        // Update leaderboard preview
+        updateLeaderboardPreview(gameState.leaderboard);
+
+        // Log recent actions
+        gameState.recentActions.forEach(action => logRecentAction(action));
+
+        // Add or remove glowing effect based on game state
+        setGameActive(gameState.state === 'in_progress');
+    } catch (error) {
+        console.error('Error fetching game state:', error);
+    }
+}
+
+// Function to add or remove glowing effect from buttons
+function setGameActive(isActive) {
+    const buttons = document.querySelectorAll('.button-container button');
+    buttons.forEach(button => {
+        if (isActive) {
+            button.classList.add('glow');
+        } else {
+            button.classList.remove('glow');
+        }
+    });
+}
+
+// Poll the backend for updates every 5 seconds
+setInterval(fetchGameState, 5000);

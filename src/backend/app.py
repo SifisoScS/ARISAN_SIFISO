@@ -13,6 +13,25 @@ game_manager = GameManager()
 def home():
     return render_template("index.html")  # This will serve an actual webpage
 
+game_state = {
+    "state": "in_progress",
+    "players": [
+        {"name": "Player 1", "hand": ["card1", "card2"]},
+        {"name": "Player 2", "hand": ["card3", "card4"]}
+    ],
+    "leaderboard": [
+        {"name": "Player 1", "score": 100},
+        {"name": "Player 2", "score": 80}
+    ],
+    "recentActions": [
+        "Player 1 drew a card",
+        "Player 2 played a card"
+    ]
+}
+
+@app.route('/game_state', methods=['GET'])
+def get_game_state():
+    return jsonify(game_state)
 @app.route('/start_game', methods=['POST'])
 def start_game():
     game_manager.start_game()  # Start a new game
