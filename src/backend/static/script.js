@@ -109,3 +109,39 @@ function showLoader() {
 function hideLoader() {
     document.getElementById('loader').style.display = 'none';
 }
+
+// Function to update the game state
+function updateGameState(state) {
+    const gameStateElement = document.getElementById('game-state');
+    gameStateElement.textContent = state;
+}
+
+// Function to update player hands
+function updatePlayerHands(players) {
+    const playerHandsElement = document.getElementById('player-hands');
+    playerHandsElement.innerHTML = players.map(player => `
+        <div>
+            <strong>${player.name}:</strong>
+            ${player.hand.map(() => `<div class="card-icon"></div>`).join('')}
+        </div>
+    `).join('');
+}
+
+// Function to update the leaderboard preview
+function updateLeaderboardPreview(leaderboard) {
+    const leaderboardPreviewElement = document.getElementById('leaderboard-preview');
+    leaderboardPreviewElement.innerHTML = leaderboard.slice(0, 3).map((entry, index) => `
+        <div>
+            <strong>${index + 1}. ${entry.name}:</strong> ${entry.score}
+        </div>
+    `).join('');
+}
+
+// Function to log recent actions
+function logRecentAction(action) {
+    const recentActionsElement = document.getElementById('recent-actions');
+    const actionElement = document.createElement('div');
+    actionElement.textContent = action;
+    recentActionsElement.appendChild(actionElement);
+    recentActionsElement.scrollTop = recentActionsElement.scrollHeight; // Auto-scroll to the latest action
+}

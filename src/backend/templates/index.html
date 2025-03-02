@@ -8,35 +8,66 @@
 </head>
 <body>
 
-    <!-- Sticky Header -->
-    <header>
-        <h1>
-            <img src="/static/card_icon.png" alt="Card Icon"> 
-            ARISAN SIFISO 
-            <img src="/static/card_icon.png" alt="Card Icon">
-        </h1>
-        <p>A lightweight card game interface</p>
-    </header>
+<!-- Sticky Header -->
+<header>
+    <h1>
+        <img src="/static/card_icon.png" alt="Card Icon"> 
+        ARISAN SIFISO 
+        <img src="/static/card_icon.png" alt="Card Icon">
+    </h1>
+    <p>A lightweight card game interface</p>
+</header>
 
-    <!-- Game Interface -->
-    <main>
-        <div class="button-container">
-            <button onclick="startGame()">Start Game</button>
-            <button onclick="resetGame()">Reset Game</button>
-            <button onclick="viewPlayers()">View Players</button>
-            <button onclick="showLeaderboard()">Leaderboard</button>
-        </div>
-        
-        <!-- Success Message -->
-        <p id="success-message" class="hidden">Game reset successfully!</p>
+<!-- Sidebar Navigation -->
+<nav class="sidebar">
+    <ul>
+        <li><a href="#"><img src="/static/icon_home.png" alt="Home Icon">Home</a></li>
+        <li><a href="#" onclick="startGame()"><img src="/static/icon_start.png" alt="Start Icon">Start Game</a></li>
+        <li><a href="#" onclick="resetGame()"><img src="/static/icon_reset.png" alt="Reset Icon">Reset Game</a></li>
+        <li><a href="#" onclick="viewPlayers()"><img src="/static/icon_players.png" alt="Players Icon">View Players</a></li>
+        <li><a href="#" onclick="showLeaderboard()"><img src="/static/icon_leaderboard.png" alt="Leaderboard Icon">Leaderboard</a></li>
+    </ul>
+</nav>
 
-        <!-- Game Results -->
-        <div id="game-results" class="results-container"></div>
+<!-- Game Interface -->
+<main>
+    <div class="button-container">
+        <button onclick="startGame()">Start Game</button>
+        <button onclick="resetGame()">Reset Game</button>
+        <button onclick="viewPlayers()">View Players</button>
+        <button onclick="showLeaderboard()">Leaderboard</button>
+    </div>
+    
+    <!-- Success Message -->
+    <p id="success-message" class="hidden">Game reset successfully!</p>
 
-        <!-- Loader -->
-        <div id="loader" class="loader"></div>
-    </main>
+    <!-- Game Results -->
+    <div id="game-results" class="results-container"></div>
 
-    <script src="/static/script.js"></script>
+    <!-- Loader -->
+    <div id="loader" class="loader"></div>
+
+    <!-- Game Status Dashboard -->
+<div class="game-dashboard">
+    <div class="game-state">
+        <h2>Game State</h2>
+        <p id="game-state">Waiting to Start</p>
+    </div>
+    <div class="player-hands">
+        <h2>Player Hands</h2>
+        <div id="player-hands"></div>
+    </div>
+    <div class="leaderboard-preview">
+        <h2>Top Players</h2>
+        <div id="leaderboard-preview"></div>
+    </div>
+    <div class="recent-actions">
+        <h2>Recent Actions</h2>
+        <div id="recent-actions"></div>
+    </div>
+</div>
+</main>
+
+<script src="/static/script.js"></script>
 </body>
 </html>
