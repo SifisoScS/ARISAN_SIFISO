@@ -19,33 +19,30 @@
 </header>
 
 <!-- Sidebar Navigation Toggle Button for small devices -->
-<button id="sidebar-toggle" class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+<button id="sidebar-toggle" class="sidebar-toggle" onclick="gameUI.toggleSidebar()" aria-label="Toggle sidebar">☰</button>
 
 <!-- Sidebar Navigation -->
 <nav class="sidebar">
     <ul>
         <li><a href="#">Home</a></li>
-        <li><a href="#" onclick="startGame()">Start Game</a></li>
-        <li><a href="#" onclick="resetGame()">Reset Game</a></li>
-        <li><a href="#" onclick="viewPlayers()">View Players</a></li>
-        <li><a href="#" onclick="showLeaderboard()">Leaderboard</a></li>
+        <li><a href="#" onclick="gameUI.startGame()">Start Game</a></li>
+        <li><a href="#" onclick="gameUI.resetGame()">Reset Game</a></li>
+        <li><a href="#" onclick="gameUI.viewPlayers()">View Players</a></li>
+        <li><a href="#" onclick="gameUI.showLeaderboard()">Leaderboard</a></li>
     </ul>
 </nav>
 
 <!-- Game Interface -->
 <main>
     <div class="button-container">
-        <button onclick="startGame()">Start Game</button>
-        <button onclick="resetGame()">Reset Game</button>
-        <button onclick="viewPlayers()">View Players</button>
-        <button onclick="showLeaderboard()">Leaderboard</button>
+        <button onclick="gameUI.startGame()">Start Game</button>
+        <button onclick="gameUI.resetGame()">Reset Game</button>
+        <button onclick="gameUI.viewPlayers()">View Players</button>
+        <button onclick="gameUI.showLeaderboard()">Leaderboard</button>
     </div>
     
     <!-- Success Message -->
     <p id="success-message" class="hidden">Game reset successfully!</p>
-
-    <!-- Game Results -->
-    <div id="game-results" class="results-container"></div>
 
     <!-- Game State Dashboard -->
     <div class="game-dashboard">
