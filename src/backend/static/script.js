@@ -108,15 +108,17 @@ class GameUI {
 
     async startGame() {
         this.showLoader();
-        fetch('/start_game', { method: 'POST' })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('game-results').innerHTML = data.message;
-                document.getElementById('game-results').classList.add('show');
-                this.setGameActive(true);
-            })
-            .catch(error => console.error("Error:", error))
-            .finally(() => this.hideLoader());
+        try {
+            const response = await fetch('/start_game', { method: 'POST' });
+            const data = await response.json();
+            document.getElementById('game-results').innerHTML = data.message;
+            document.getElementById('game-results').classList.add('show');
+            this.setGameActive(true);
+        } catch (error) {
+            console.error("Error:", error);
+        } finally {
+            this.hideLoader();
+        }
     }
 
     async resetGame() {
