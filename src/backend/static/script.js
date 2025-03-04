@@ -31,7 +31,7 @@ function updateLeaderboardPreview(leaderboard) {
     const maxEntries = 3;
     let displayedEntries = leaderboard.slice(0, maxEntries).map((entry, index) => `
         <div>
-            <strong>${index + 1}. ${entry.name}:</strong> ${entry.score}
+            <strong>${index + 1}. ${entry.name}:</strong> ${entry.wins} wins
         </div>
     `);
     if (leaderboard.length < maxEntries) {
@@ -67,7 +67,7 @@ function startGame() {
         .then(data => {
             document.getElementById('game-results').innerHTML = data.message;
             document.getElementById('game-results').classList.add('show');
-            setGameActive(true); // Add glowing effect to buttons
+            fetchGameState(); // Fetch game state after starting
         })
         .catch(error => console.error("Error:", error))
         .finally(() => hideLoader());
@@ -84,7 +84,6 @@ function resetGame() {
                 document.getElementById("success-message").classList.remove("show");
             }, 2000);
             document.getElementById('game-results').classList.remove('show');
-            setGameActive(false); // Remove glowing effect from buttons
         })
         .catch(error => console.error("Error:", error))
         .finally(() => hideLoader());
@@ -98,7 +97,7 @@ async function viewPlayers() {
         const players = await response.json();
 
         const resultsContainer = document.getElementById('game-results');
-        resultsContainer.innerHTML = ''; // Clear previous content
+        resultsContainer.innerHTML = '';
 
         if (players.length > 0) {
             const playerList = document.createElement('ul');
@@ -128,7 +127,7 @@ async function showLeaderboard() {
         const leaderboard = await response.json();
 
         const resultsContainer = document.getElementById('game-results');
-        resultsContainer.innerHTML = ''; // Clear previous content
+        resultsContainer.innerHTML = '';
 
         if (leaderboard.length > 0) {
             const leaderboardTable = document.createElement('table');
@@ -184,7 +183,7 @@ async function fetchGameState() {
         updateLeaderboardPreview(gameState.leaderboard);
 
         // Log recent actions
-        gameState.recentActions.forEach(action => logRecentAction(action));
+        updateRecentActions(gameState.recentActions);
 
         // Add or remove glowing effect based on game state
         setGameActive(gameState.state === 'in_progress');
@@ -193,16 +192,134 @@ async function fetchGameState() {
     }
 }
 
-// Function to add or remove glowing effect from buttons
-function setGameActive(isActive) {
-    const buttons = document.querySelectorAll('.button-container button');
-    buttons.forEach(button => {
-        if (isActive) {
-            button.classList.add('glow');
-        } else {
-            button.classList.remove('glow');
-        }
+// Function to update player hands
+function updatePlayerHands(players) {
+    const playerHandsElement = document.getElementById('player-hands');
+    playerHandsElement.innerHTML = ''; // Clear previous content
+
+    players.forEach(player => {
+        const playerDiv = document.createElement('div');
+        playerDiv.innerHTML = `
+            <strong>${player.name}:</strong>
+            ${player.hand.map(card => `<div class="card-icon">${card}</div>`).join('')}
+        `;
+        playerHandsElement.appendChild(playerDiv);
     });
+}
+
+// Function to update the leaderboard preview
+function updateLeaderboardPreview(leaderboard) {
+    const leaderboardPreviewElement = document.getElementById('leaderboard-preview');
+    if (!leaderboard || leaderboard.length === 0) {
+        leaderboardPreviewElement.innerHTML = `<div>No leaderboard entries available</div>`;
+        return;
+    }
+
+    const maxEntries = 3;
+    const displayedEntries = leaderboard.slice(0, maxEntries).map((entry, index) => `
+        <div>
+            <strong>${index + 1}. ${entry.name}:</strong> ${entry.wins} wins
+        </div>
+    `).join('');
+
+    leaderboardPreviewElement.innerHTML = displayedEntries;
+}
+
+// Function to update recent actions
+function updateRecentActions(actions) {
+    const recentActionsElement = document.getElementById('recent-actions');
+    recentActionsElement.innerHTML = ''; // Clear previous content
+
+    actions.forEach(action => {
+        const actionElement = document.createElement('div');
+        actionElement.textContent = action;
+        recentActionsElement.appendChild(actionElement);
+    });
+
+    // Auto-scroll to the latest action
+    recentActionsElement.scrollTop = recentActionsElement.scrollHeight;
+}
+
+// Function to update recent actions
+function updateRecentActions(actions) {
+    const recentActionsElement = document.getElementById('recent-actions');
+    recentActionsElement.innerHTML = ''; // Clear previous content
+
+    actions.forEach(action => {
+        const actionElement = document.createElement('div');
+        actionElement.textContent = action;
+        recentActionsElement.appendChild(actionElement);
+    });
+
+    // Auto-scroll to the latest action
+    recentActionsElement.scrollTop = recentActionsElement.scrollHeight;
+}
+
+// Function to draw a card
+async function drawCard() {
+    try {
+        showLoader();
+        const response = await fetch('/draw_card', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ player_name: 'Human Player' }),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to draw card');
+        }
+
+        const data = await response.json();
+        const humanPlayerHand = document.getElementById('human-player-hand');
+        humanPlayerHand.innerHTML += `<div class="card-icon">${data.card}</div>`;
+    } catch (error) {
+        console.error('Error drawing card:', error);
+        alert(error.message);  // Show an error message to the user
+    } finally {
+        hideLoader();
+    }
+}
+
+// Function to play a card
+async function playCard() {
+    try {
+        showLoader();
+        const humanPlayerHand = document.getElementById('human-player-hand');
+        const cards = humanPlayerHand.querySelectorAll('.card-icon');
+
+        if (cards.length === 0) {
+            alert('No cards to play!');
+            return;
+        }
+
+        const lastCard = cards[cards.length - 1];
+        const cardValue = lastCard.textContent;
+
+        // Send a request to the server to play the card
+        const response = await fetch('/play_card', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ player_name: 'Human Player', card: cardValue }),
+        });
+
+        const data = await response.json();
+
+        // Remove the card from the hand
+        humanPlayerHand.removeChild(lastCard);
+
+        // Log the action
+        logRecentAction(data.message);
+    } catch (error) {
+        console.error('Error playing card:', error);
+        alert(error.message);
+    } finally {
+        hideLoader();
+    }
 }
 
 // Poll the backend for updates every 5 seconds

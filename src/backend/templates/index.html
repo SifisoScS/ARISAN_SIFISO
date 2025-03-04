@@ -36,18 +36,18 @@
 <main>
     <div class="button-container">
         <button onclick="startGame()">Start Game</button>
-        <button onclick="resetGame()">Reset Game</button>
-        <button onclick="viewPlayers()">View Players</button>
-        <button onclick="showLeaderboard()">Leaderboard</button>
+        <button onclick="drawCard()">Draw Card</button>
+        <button onclick="playCard()">Play Card</button>
+    </div>
+
+    <div class="human-player">
+        <h2>Your Hand</h2>
+        <div id="human-player-hand"></div>
     </div>
     
-    <!-- Success Message -->
     <p id="success-message" class="hidden">Game reset successfully!</p>
-
-    <!-- Game Results -->
     <div id="game-results" class="results-container"></div>
 
-    <!-- Game State Dashboard -->
     <div class="game-dashboard">
         <div class="game-state">
             <h2>Game State</h2>
@@ -67,7 +67,6 @@
         </div>
     </div>
 
-    <!-- Loader -->
     <div id="loader" class="loader"></div>
 </main>
 

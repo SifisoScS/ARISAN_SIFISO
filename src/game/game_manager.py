@@ -16,6 +16,7 @@ class GameManager:
     def __init__(self, num_players=5, include_human=False):
         self.deck = Deck()
         self.players = []
+        self.include_human = include_human
         strategies = ["aggressive", "defensive", "balanced", "strategic"]
 
         # Add AI Players
@@ -23,7 +24,17 @@ class GameManager:
             strategy = random.choice(strategies)
             self.players.append(CardPlayerAgent(f"Player {i+1}", strategy))
 
+        # Add Human Player if included
+        if include_human:
+            self.players.append(CardPlayerAgent("Human Player", "human"))
+
         self.leaderboard = self.load_leaderboard()  # Load or create leaderboard
+        self.game_state = {
+            "state": "in_progress",
+            "players": [],
+            "leaderboard": [],
+            "recentActions": []
+        }
 
     def deal_cards(self):
         """Deals 5 cards to each player."""
@@ -34,7 +45,8 @@ class GameManager:
         """Allows AI players to swap cards based on their strategy."""
         print("\n🔄 AI Players Swapping Cards 🔄\n")
         for player in self.players:
-            player.swap_card(self.deck)
+            if player.strategy != "human":  # Human players don't swap cards automatically
+                player.swap_card(self.deck)
 
     def display_scores(self):
         """Displays each player's hand and score."""
@@ -67,6 +79,58 @@ class GameManager:
                 return  # No update to leaderboard if tied after tie-breaker
 
         self.save_leaderboard()  # Save leaderboard after updating
+
+    def draw_card(self, player_name):
+        """
+        Draws a card from the deck and adds it to the specified player's hand.
+        Args:
+            player_name (str): The name of the player drawing the card.
+        Returns:
+            dict: The drawn card.
+        Raises:
+            ValueError: If the deck is empty or the player is not found.
+        """
+        if not self.deck.cards:
+            raise ValueError("No cards left in the deck!")
+
+        card = self.deck.cards.pop()  # Draw the top card from the deck
+
+        # Use named expression to simplify assignment and conditional
+        if player := next((p for p in self.players if p.name == player_name), None):
+            player.hand.append(card)  # Add the card to the player's hand
+        else:
+            raise ValueError(f"Player '{player_name}' not found!")
+
+        print(f"{player_name}'s hand after drawing: {[f'{c.rank} of {c.suit}' for c in player.hand]}")  # Debug print
+        return card
+
+
+    def play_card(self, player_name, card):
+        """
+        Plays a card from the specified player's hand.
+        Args:
+            player_name (str): The name of the player playing the card.
+            card (str): The card to play (e.g., "Ace of Spades").
+        Raises:
+            ValueError: If the player is not found or the card is not in their hand.
+        """
+        player = next((p for p in self.players if p.name == player_name), None)
+
+        if not player:
+            raise ValueError(f"Player '{player_name}' not found!")
+
+        # Find the card in the player's hand
+        card_found = next((c for c in player.hand if f"{c.rank} of {c.suit}" == card), None)
+
+
+        if not card_found:
+            raise ValueError(f"Card '{card}' not found in {player_name}'s hand!")
+
+        # Remove the card from the player's hand
+        player.hand.remove(card_found)
+
+        # Log the action
+        self.game_state['recentActions'].append(f"{player_name} played {card}")
 
     def load_leaderboard(self):
         """Loads the leaderboard from a file or creates a new one if missing."""
@@ -102,3 +166,15 @@ class GameManager:
         """Returns a **sorted global leaderboard** for all past games."""
         sorted_leaderboard = sorted(self.leaderboard.items(), key=lambda x: x[1], reverse=True)
         return [{"name": player, "wins": wins} for player, wins in sorted_leaderboard]
+    
+def get_game_state(self):
+    """Returns the current game state, including player hands and leaderboard."""
+    return {
+        "state": self.game_state["state"],
+        "players": [
+            {"name": player.name, "hand": [f"{card.rank} of {card.suit}" for card in player.hand]}
+            for player in self.players
+        ],
+        "leaderboard": self.get_leaderboard(),
+        "recentActions": self.game_state["recentActions"]
+    }
