@@ -131,6 +131,7 @@ class GameManager:
 
         # Log the action
         self.game_state['recentActions'].append(f"{player_name} played {card}")
+        print(f"{player_name} played {card}")  # Log the action to the terminal
 
     def load_leaderboard(self):
         """Loads the leaderboard from a file or creates a new one if missing."""
