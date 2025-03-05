@@ -255,7 +255,76 @@ function updateRecentActions(actions) {
     recentActionsElement.scrollTop = recentActionsElement.scrollHeight;
 }
 
-// Function to draw a card
+// Function to make cards clickable
+function makeCardsClickable() {
+    const cards = document.querySelectorAll('#human-player-hand .card-icon');
+    cards.forEach(card => {
+        card.addEventListener('click', () => {
+            // Remove the 'selected' class from all cards
+            cards.forEach(c => c.classList.remove('selected'));
+
+            // Add the 'selected' class to the clicked card
+            card.classList.add('selected');
+
+            // Play the selected card
+            playCard(card);
+        });
+    });
+}
+
+// Function to play a specific card
+async function playCard(cardElement) {
+    try {
+        showLoader();
+        const cardValue = cardElement.textContent;
+
+        console.log(`Playing card: ${cardValue}`); // Debug log
+
+        // Highlight the selected card
+        cardElement.classList.add('selected');
+
+        // Add a short delay to allow the highlight to be visible
+        await new Promise(resolve => setTimeout(resolve, 300)); // 300ms delay
+
+        // Send a request to the server to play the card
+        const response = await fetch('/play_card', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ player_name: 'Human Player', card: cardValue }),
+        });
+
+        const data = await response.json();
+        console.log('Server response:', data); // Debug log
+
+        // Remove the card from the hand
+        cardElement.remove();
+
+        // Log the action
+        logRecentAction(data.message);
+    } catch (error) {
+        console.error('Error playing card:', error);
+        alert(error.message); // Show an error message to the user
+    } finally {
+        hideLoader();
+    }
+}
+
+// Call this function after updating the human player's hand
+function updateHumanPlayerHand(cards) {
+    const humanPlayerHand = document.getElementById('human-player-hand');
+    humanPlayerHand.innerHTML = cards.map(card => `
+        <div class="card-icon">${card}</div>
+    `).join('');
+    makeCardsClickable(); // Make the new cards clickable
+
+    // Disable the "Play Card" button if there are no cards
+    const playCardButton = document.querySelector('.button-container button:nth-child(3)');
+    playCardButton.disabled = cards.length === 0;
+}
+
+// Update the drawCard() function to call updateHumanPlayerHand
 async function drawCard() {
     try {
         showLoader();
@@ -275,48 +344,10 @@ async function drawCard() {
         const data = await response.json();
         const humanPlayerHand = document.getElementById('human-player-hand');
         humanPlayerHand.innerHTML += `<div class="card-icon">${data.card}</div>`;
+        makeCardsClickable(); // Make the new card clickable
     } catch (error) {
         console.error('Error drawing card:', error);
-        alert(error.message);  // Show an error message to the user
-    } finally {
-        hideLoader();
-    }
-}
-
-// Function to play a card
-async function playCard() {
-    try {
-        showLoader();
-        const humanPlayerHand = document.getElementById('human-player-hand');
-        const cards = humanPlayerHand.querySelectorAll('.card-icon');
-
-        if (cards.length === 0) {
-            alert('No cards to play!');
-            return;
-        }
-
-        const lastCard = cards[cards.length - 1];
-        const cardValue = lastCard.textContent;
-
-        // Send a request to the server to play the card
-        const response = await fetch('/play_card', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ player_name: 'Human Player', card: cardValue }),
-        });
-
-        const data = await response.json();
-
-        // Remove the card from the hand
-        humanPlayerHand.removeChild(lastCard);
-
-        // Log the action
-        logRecentAction(data.message);
-    } catch (error) {
-        console.error('Error playing card:', error);
-        alert(error.message);
+        alert(error.message); // Show an error message to the user
     } finally {
         hideLoader();
     }
