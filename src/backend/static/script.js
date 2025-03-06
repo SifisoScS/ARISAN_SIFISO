@@ -1,6 +1,14 @@
-// Function to play sound effects
+const audioCache = {};
+
 function playSoundEffect(sound) {
-    const audio = new Audio(sound);
+    let audio = audioCache[sound];
+    if (!audio) {
+        audio = new Audio(sound);
+        audio.load();
+        audioCache[sound] = audio;
+    } else {
+        audio.currentTime = 0;
+    }
     audio.play();
 }
 
