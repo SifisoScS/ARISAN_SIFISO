@@ -49,7 +49,7 @@ header p {
     top: 0;
     height: 100vh;
     width: 200px;
-    background: linear-gradient(135deg, #1E2E3E, #1E1E2E); /* Dark Purple Gradient */
+    background: linear-gradient(135deg, #2E1E2E, #1E1E2E); /* Dark Purple Gradient */
     backdrop-filter: blur(10px);
     padding: 20px;
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
@@ -117,6 +117,7 @@ header p {
     }
 }
 
+/* Main Container */
 main {
     width: 80%;
     max-width: 800px;
@@ -130,6 +131,7 @@ main {
     backdrop-filter: blur(10px);
 }
 
+/* Button Container */
 .button-container {
     display: flex;
     justify-content: center;
@@ -172,6 +174,7 @@ button:active {
     opacity: 1;
 }
 
+/* Results Container */
 .results-container {
     margin-top: 20px;
     padding: 15px;
@@ -203,6 +206,7 @@ button:active {
     100% { transform: rotate(360deg); }
 }
 
+/* Table Styles */
 table {
     width: 100%;
     border-collapse: collapse;
@@ -220,6 +224,7 @@ table th {
     color: #FFFFFF;
 }
 
+/* List Styles */
 ul {
     list-style-type: none;
     padding: 0;
@@ -234,7 +239,7 @@ ul li:last-child {
     border-bottom: none;
 }
 
-/* Additional Styles for Game Status Dashboard */
+/* Game Status Dashboard */
 .game-dashboard {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -282,6 +287,7 @@ ul li:last-child {
     background: #1E1E2E; 
 }
 
+/* Human Player Section */
 .human-player {
     margin-top: 20px;
 }
@@ -298,4 +304,71 @@ ul li:last-child {
     box-shadow: 0 0 10px #00FFFF; /* Glow effect */
     transform: scale(1.1); /* Slightly enlarge the card */
     transition: all 0.3s ease; /* Smooth transition */
+}
+
+/* Animation for drawing a card */
+@keyframes drawCard {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Animation for playing a card */
+@keyframes playCard {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-100px);
+    }
+}
+
+/* Animation for swapping cards */
+@keyframes swapCard {
+    0% {
+        transform: translateX(0);
+    }
+    50% {
+        transform: translateX(100px);
+    }
+    100% {
+        transform: translateX(0);
+    }
+}
+
+/* Animation for winning the game */
+@keyframes winGame {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Apply animations to cards */
+.card-icon {
+    animation: drawCard 0.5s ease-in-out;
+}
+
+.card-icon.playing {
+    animation: playCard 0.5s ease-in-out forwards;
+}
+
+.card-icon.swapping {
+    animation: swapCard 0.5s ease-in-out;
+}
+
+.win-animation {
+    animation: winGame 1s ease-in-out;
 }

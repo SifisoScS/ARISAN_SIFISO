@@ -1,3 +1,17 @@
+const audioCache = {};
+
+function playSoundEffect(sound) {
+    let audio = audioCache[sound];
+    if (!audio) {
+        audio = new Audio(sound);
+        audio.load();
+        audioCache[sound] = audio;
+    } else {
+        audio.currentTime = 0;
+    }
+    audio.play();
+}
+
 // Function to toggle the sidebar
 function toggleSidebar() {
     var sidebar = document.querySelector('.sidebar');
@@ -240,21 +254,6 @@ function updateRecentActions(actions) {
     recentActionsElement.scrollTop = recentActionsElement.scrollHeight;
 }
 
-// Function to update recent actions
-function updateRecentActions(actions) {
-    const recentActionsElement = document.getElementById('recent-actions');
-    recentActionsElement.innerHTML = ''; // Clear previous content
-
-    actions.forEach(action => {
-        const actionElement = document.createElement('div');
-        actionElement.textContent = action;
-        recentActionsElement.appendChild(actionElement);
-    });
-
-    // Auto-scroll to the latest action
-    recentActionsElement.scrollTop = recentActionsElement.scrollHeight;
-}
-
 // Function to make cards clickable
 function makeCardsClickable() {
     const cards = document.querySelectorAll('#human-player-hand .card-icon');
@@ -272,6 +271,50 @@ function makeCardsClickable() {
     });
 }
 
+// Function to draw a card
+async function drawCard() {
+    try {
+        showLoader();
+        const response = await fetch('/draw_card', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ player_name: 'Human Player' }),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to draw card');
+        }
+
+        const data = await response.json();
+        const humanPlayerHand = document.getElementById('human-player-hand');
+
+        // Create a new card element
+        const newCard = document.createElement('div');
+        newCard.className = 'card-icon';
+        newCard.textContent = data.card;
+
+        // Add the new card to the hand
+        humanPlayerHand.appendChild(newCard);
+
+        // Trigger the draw animation
+        newCard.style.animation = 'drawCard 0.5s ease-in-out';
+
+        // Play sound effect for drawing a card
+        playSoundEffect('sounds/draw_card.mp3');
+
+        // Make the new card clickable
+        makeCardsClickable();
+    } catch (error) {
+        console.error('Error drawing card:', error);
+        alert(error.message); // Show an error message to the user
+    } finally {
+        hideLoader();
+    }
+}
+
 // Function to play a specific card
 async function playCard(cardElement) {
     try {
@@ -285,6 +328,15 @@ async function playCard(cardElement) {
 
         // Add a short delay to allow the highlight to be visible
         await new Promise(resolve => setTimeout(resolve, 300)); // 300ms delay
+
+        // Trigger the play animation
+        cardElement.style.animation = 'playCard 0.5s ease-in-out forwards';
+
+        // Play sound effect for playing a card
+        playSoundEffect('sounds/play_card.mp3');
+
+        // Wait for the animation to complete
+        await new Promise(resolve => setTimeout(resolve, 500)); // 500ms delay
 
         // Send a request to the server to play the card
         const response = await fetch('/play_card', {
@@ -311,6 +363,59 @@ async function playCard(cardElement) {
     }
 }
 
+// Function to swap cards
+async function swapCards(card1, card2) {
+    try {
+        showLoader();
+        const response = await fetch('/swap_cards', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ card1, card2 }),
+        });
+
+        const data = await response.json();
+        console.log('Server response:', data); // Debug log
+
+        // Trigger the swap animation
+        const cardElements = document.querySelectorAll('.card-icon');
+        cardElements.forEach(card => {
+            if (card.textContent === card1 || card.textContent === card2) {
+                card.classList.add('swapping');
+            }
+        });
+
+        // Play sound effect for swapping cards
+        playSoundEffect('sounds/swap_cards.mp3');
+
+        // Wait for the animation to complete
+        await new Promise(resolve => setTimeout(resolve, 500)); // 500ms delay
+
+        // Update the player hands
+        fetchGameState();
+    } catch (error) {
+        console.error('Error swapping cards:', error);
+        alert(error.message); // Show an error message to the user
+    } finally {
+        hideLoader();
+    }
+}
+
+// Function to handle winning the game
+function handleWin() {
+    const gameStateElement = document.getElementById('game-state');
+    gameStateElement.classList.add('win-animation');
+
+    // Play sound effect for winning the game
+    playSoundEffect('sounds/win_game.mp3');
+
+    // Remove the animation after it completes
+    setTimeout(() => {
+        gameStateElement.classList.remove('win-animation');
+    }, 1000);
+}
+
 // Call this function after updating the human player's hand
 function updateHumanPlayerHand(cards) {
     const humanPlayerHand = document.getElementById('human-player-hand');
@@ -322,35 +427,6 @@ function updateHumanPlayerHand(cards) {
     // Disable the "Play Card" button if there are no cards
     const playCardButton = document.querySelector('.button-container button:nth-child(3)');
     playCardButton.disabled = cards.length === 0;
-}
-
-// Update the drawCard() function to call updateHumanPlayerHand
-async function drawCard() {
-    try {
-        showLoader();
-        const response = await fetch('/draw_card', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ player_name: 'Human Player' }),
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Failed to draw card');
-        }
-
-        const data = await response.json();
-        const humanPlayerHand = document.getElementById('human-player-hand');
-        humanPlayerHand.innerHTML += `<div class="card-icon">${data.card}</div>`;
-        makeCardsClickable(); // Make the new card clickable
-    } catch (error) {
-        console.error('Error drawing card:', error);
-        alert(error.message); // Show an error message to the user
-    } finally {
-        hideLoader();
-    }
 }
 
 // Poll the backend for updates every 5 seconds
