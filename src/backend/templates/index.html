@@ -29,6 +29,7 @@
         <li><a href="#" onclick="resetGame()">Reset Game</a></li>
         <li><a href="#" onclick="viewPlayers()">View Players</a></li>
         <li><a href="#" onclick="showLeaderboard()">Leaderboard</a></li>
+        <li><a href="#" onclick="openDeckBuilder()">Deck Builder</a></li> <!-- Improved Naming -->
     </ul>
 </nav>
 
@@ -37,7 +38,8 @@
     <div class="button-container">
         <button onclick="startGame()">Start Game</button>
         <button onclick="drawCard()">Draw Card</button>
-        <button>Play Card</button>
+        <button onclick="playCard()">Play Card</button>
+        <button onclick="openDeckBuilder()">Deck Builder</button> <!-- Improved Naming -->
     </div>
 
     <div class="human-player">
@@ -55,7 +57,16 @@
         </div>
         <div class="player-hands">
             <h2>Player Hands</h2>
-            <div id="player-hands"></div>
+            <div id="player-hands">
+                <div class="human-player">
+                    <h3>Your Hand</h3>
+                    <div id="human-player-hand"></div>
+                </div>
+                <div class="opponent-player">
+                    <h3>Opponent's Hand</h3>
+                    <div id="opponent-hand"></div> <!-- Added Opponent's Hand -->
+                </div>
+            </div>
         </div>
         <div class="leaderboard-preview">
             <h2>Top Players</h2>
