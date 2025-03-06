@@ -1,5 +1,6 @@
 const audioCache = {};
 
+// Function to play sound effects
 function playSoundEffect(sound) {
     let audio = audioCache[sound];
     if (!audio) {
@@ -14,7 +15,7 @@ function playSoundEffect(sound) {
 
 // Function to toggle the sidebar
 function toggleSidebar() {
-    var sidebar = document.querySelector('.sidebar');
+    const sidebar = document.querySelector('.sidebar');
     sidebar.classList.toggle('active');
 }
 
@@ -206,54 +207,6 @@ async function fetchGameState() {
     }
 }
 
-// Function to update player hands
-function updatePlayerHands(players) {
-    const playerHandsElement = document.getElementById('player-hands');
-    playerHandsElement.innerHTML = ''; // Clear previous content
-
-    players.forEach(player => {
-        const playerDiv = document.createElement('div');
-        playerDiv.innerHTML = `
-            <strong>${player.name}:</strong>
-            ${player.hand.map(card => `<div class="card-icon">${card}</div>`).join('')}
-        `;
-        playerHandsElement.appendChild(playerDiv);
-    });
-}
-
-// Function to update the leaderboard preview
-function updateLeaderboardPreview(leaderboard) {
-    const leaderboardPreviewElement = document.getElementById('leaderboard-preview');
-    if (!leaderboard || leaderboard.length === 0) {
-        leaderboardPreviewElement.innerHTML = `<div>No leaderboard entries available</div>`;
-        return;
-    }
-
-    const maxEntries = 3;
-    const displayedEntries = leaderboard.slice(0, maxEntries).map((entry, index) => `
-        <div>
-            <strong>${index + 1}. ${entry.name}:</strong> ${entry.wins} wins
-        </div>
-    `).join('');
-
-    leaderboardPreviewElement.innerHTML = displayedEntries;
-}
-
-// Function to update recent actions
-function updateRecentActions(actions) {
-    const recentActionsElement = document.getElementById('recent-actions');
-    recentActionsElement.innerHTML = ''; // Clear previous content
-
-    actions.forEach(action => {
-        const actionElement = document.createElement('div');
-        actionElement.textContent = action;
-        recentActionsElement.appendChild(actionElement);
-    });
-
-    // Auto-scroll to the latest action
-    recentActionsElement.scrollTop = recentActionsElement.scrollHeight;
-}
-
 // Function to make cards clickable
 function makeCardsClickable() {
     const cards = document.querySelectorAll('#human-player-hand .card-icon');
@@ -363,45 +316,6 @@ async function playCard(cardElement) {
     }
 }
 
-// Function to swap cards
-async function swapCards(card1, card2) {
-    try {
-        showLoader();
-        const response = await fetch('/swap_cards', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ card1, card2 }),
-        });
-
-        const data = await response.json();
-        console.log('Server response:', data); // Debug log
-
-        // Trigger the swap animation
-        const cardElements = document.querySelectorAll('.card-icon');
-        cardElements.forEach(card => {
-            if (card.textContent === card1 || card.textContent === card2) {
-                card.classList.add('swapping');
-            }
-        });
-
-        // Play sound effect for swapping cards
-        playSoundEffect('sounds/swap_cards.mp3');
-
-        // Wait for the animation to complete
-        await new Promise(resolve => setTimeout(resolve, 500)); // 500ms delay
-
-        // Update the player hands
-        fetchGameState();
-    } catch (error) {
-        console.error('Error swapping cards:', error);
-        alert(error.message); // Show an error message to the user
-    } finally {
-        hideLoader();
-    }
-}
-
 // Function to handle winning the game
 function handleWin() {
     const gameStateElement = document.getElementById('game-state');
@@ -414,19 +328,6 @@ function handleWin() {
     setTimeout(() => {
         gameStateElement.classList.remove('win-animation');
     }, 1000);
-}
-
-// Call this function after updating the human player's hand
-function updateHumanPlayerHand(cards) {
-    const humanPlayerHand = document.getElementById('human-player-hand');
-    humanPlayerHand.innerHTML = cards.map(card => `
-        <div class="card-icon">${card}</div>
-    `).join('');
-    makeCardsClickable(); // Make the new cards clickable
-
-    // Disable the "Play Card" button if there are no cards
-    const playCardButton = document.querySelector('.button-container button:nth-child(3)');
-    playCardButton.disabled = cards.length === 0;
 }
 
 // Poll the backend for updates every 5 seconds
