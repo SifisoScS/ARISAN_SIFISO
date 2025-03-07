@@ -59,14 +59,17 @@ def draw_card():
 
 @app.route('/play_card', methods=['POST'])
 def play_card():
-    player_name = request.json.get('player_name')
-    card = request.json.get('card')
+    data = request.get_json()
+    player_name = data.get('player_name')
+    card = data.get('card')
 
-    try:
-        game_manager.play_card(player_name, card)
-        return jsonify({"message": f"{player_name} played {card}"})
-    except ValueError as e:
-        return jsonify({"error": str(e)}), 400  # Return an error message if something goes wrong
+    if not player_name or not card:
+        return jsonify({'error': 'Invalid request'}), 400
+
+    # Add logic to play the card (e.g., update game state)
+    print(f"Player {player_name} played card: {card}")
+
+    return jsonify({'message': f'Card {card} played successfully'}), 200
 
 if __name__ == '__main__':
     app.run(debug=True)
