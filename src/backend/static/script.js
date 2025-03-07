@@ -217,9 +217,6 @@ function makeCardsClickable() {
 
             // Add the 'selected' class to the clicked card
             card.classList.add('selected');
-
-            // Play the selected card
-            playCard(card);
         });
     });
 }
@@ -269,21 +266,27 @@ async function drawCard() {
 }
 
 // Function to play a specific card
-async function playCard(cardElement) {
+async function playCard() {
     try {
-        showLoader();
-        const cardValue = cardElement.textContent;
+        const humanPlayerHand = document.getElementById('human-player-hand');
+        const selectedCard = humanPlayerHand.querySelector('.card-icon.selected');
 
-        console.log(`Playing card: ${cardValue}`); // Debug log
+        // Check if a card is selected
+        if (!selectedCard) {
+            alert('Please select a card to play!');
+            return;
+        }
+
+        const cardValue = selectedCard.textContent;
 
         // Highlight the selected card
-        cardElement.classList.add('selected');
+        selectedCard.classList.add('selected');
 
         // Add a short delay to allow the highlight to be visible
         await new Promise(resolve => setTimeout(resolve, 300)); // 300ms delay
 
         // Trigger the play animation
-        cardElement.style.animation = 'playCard 0.5s ease-in-out forwards';
+        selectedCard.style.animation = 'playCard 0.5s ease-in-out forwards';
 
         // Play sound effect for playing a card
         playSoundEffect('sounds/play_card.mp3');
@@ -304,7 +307,7 @@ async function playCard(cardElement) {
         console.log('Server response:', data); // Debug log
 
         // Remove the card from the hand
-        cardElement.remove();
+        selectedCard.remove();
 
         // Log the action
         logRecentAction(data.message);
@@ -328,6 +331,186 @@ function handleWin() {
     setTimeout(() => {
         gameStateElement.classList.remove('win-animation');
     }, 1000);
+}
+
+let savedDecks = []; // Array to store saved decks
+
+function openDeckBuilder() {
+    // Create a modal container
+    const modal = document.createElement('div');
+    modal.id = 'deck-builder-modal';
+    modal.style.position = 'fixed';
+    modal.style.top = '0';
+    modal.style.left = '0';
+    modal.style.width = '100%';
+    modal.style.height = '100%';
+    modal.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+    modal.style.display = 'flex';
+    modal.style.justifyContent = 'center';
+    modal.style.alignItems = 'center';
+    modal.style.zIndex = '1000';
+
+    // Create modal content
+    const modalContent = document.createElement('div');
+    modalContent.style.backgroundColor = '#fff';
+    modalContent.style.padding = '20px';
+    modalContent.style.borderRadius = '10px';
+    modalContent.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
+    modalContent.style.maxWidth = '500px';
+    modalContent.style.width = '100%';
+
+    // Add a title to the modal
+    const title = document.createElement('h2');
+    title.textContent = 'Deck Builder';
+    title.style.marginBottom = '20px';
+    modalContent.appendChild(title);
+
+    // Add a form for deck-building
+    const form = document.createElement('form');
+    form.id = 'deck-builder-form';
+
+    // Input for deck name
+    const deckNameLabel = document.createElement('label');
+    deckNameLabel.textContent = 'Deck Name:';
+    deckNameLabel.style.display = 'block';
+    deckNameLabel.style.marginBottom = '10px';
+    const deckNameInput = document.createElement('input');
+    deckNameInput.type = 'text';
+    deckNameInput.name = 'deckName';
+    deckNameInput.required = true;
+    deckNameInput.style.width = '100%';
+    deckNameInput.style.padding = '8px';
+    deckNameInput.style.marginBottom = '20px';
+    form.appendChild(deckNameLabel);
+    form.appendChild(deckNameInput);
+
+    // Button to submit the form
+    const submitButton = document.createElement('button');
+    submitButton.type = 'submit';
+    submitButton.textContent = 'Save Deck';
+    submitButton.style.padding = '10px 20px';
+    submitButton.style.backgroundColor = '#007BFF';
+    submitButton.style.color = '#fff';
+    submitButton.style.border = 'none';
+    submitButton.style.borderRadius = '5px';
+    submitButton.style.cursor = 'pointer';
+    form.appendChild(submitButton);
+
+    // Add form to modal content
+    modalContent.appendChild(form);
+
+    // Add modal content to modal
+    modal.appendChild(modalContent);
+
+    // Add modal to the body
+    document.body.appendChild(modal);
+
+    // Close modal when clicking outside the modal content
+    modal.addEventListener('click', (event) => {
+        if (event.target === modal) {
+            closeModal();
+        }
+    });
+
+    // Handle form submission
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const deckName = deckNameInput.value.trim();
+        if (deckName) {
+            // Save the deck with its name and cards
+            const deck = {
+                name: deckName,
+                cards: ['Card 1', 'Card 2', 'Card 3'] // Example cards, replace with actual cards
+            };
+            savedDecks.push(deck);
+            alert(`Deck "${deckName}" saved successfully!`);
+            closeModal();
+            displaySavedDecks(); // Update the UI to show saved decks
+        } else {
+            alert('Please enter a deck name.');
+        }
+    });
+
+    // Function to close the modal
+    function closeModal() {
+        document.body.removeChild(modal);
+    }
+}
+
+// Function to display saved decks in the UI
+function displaySavedDecks() {
+    const savedDecksContainer = document.getElementById('saved-decks');
+    if (savedDecksContainer) {
+        savedDecksContainer.innerHTML = savedDecks.map((deck, index) => `
+            <div class="saved-deck" onclick="useDeck(${index})">
+                <strong>${deck.name}</strong>
+                <div class="deck-actions">
+                    <button onclick="useDeck(${index})">Use</button>
+                    <button onclick="deleteDeck(${index})">Delete</button>
+                </div>
+            </div>
+        `).join('');
+    }
+}
+
+// Function to use a saved deck
+async function useDeck(index) {
+    const selectedDeck = savedDecks[index];
+    alert(`Using deck: ${selectedDeck.name}`);
+
+    // Load the deck into the player's hand
+    loadDeckIntoGame(selectedDeck);
+
+    // Send the deck's cards to the backend
+    try {
+        const response = await fetch('/play_deck', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                player_name: 'Human Player',
+                deck: selectedDeck.cards,
+            }),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to play deck');
+        }
+
+        const data = await response.json();
+        console.log('Server response:', data); // Debug log
+    } catch (error) {
+        console.error('Error playing deck:', error);
+        alert(error.message); // Show an error message to the user
+    }
+}
+
+// Function to delete a saved deck
+function deleteDeck(index) {
+    if (confirm('Are you sure you want to delete this deck?')) {
+        savedDecks.splice(index, 1);
+        displaySavedDecks(); // Refresh the saved decks list
+    }
+}
+
+// Function to load a deck into the game
+function loadDeckIntoGame(deck) {
+    // Clear the current hand
+    const humanPlayerHand = document.getElementById('human-player-hand');
+    humanPlayerHand.innerHTML = '';
+
+    // Add cards from the deck to the player's hand
+    deck.cards.forEach(card => {
+        const cardElement = document.createElement('div');
+        cardElement.className = 'card-icon';
+        cardElement.textContent = card;
+        humanPlayerHand.appendChild(cardElement);
+    });
+
+    // Make the new cards clickable
+    makeCardsClickable();
 }
 
 // Poll the backend for updates every 5 seconds
