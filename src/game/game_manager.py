@@ -129,9 +129,13 @@ class GameManager:
         # Remove the card from the player's hand
         player.hand.remove(card_found)
 
-        # Log the action
+        # Log the action and update game state
+        self.game_state['recentActions'].append(f"{player_name} played {card}")
+
         self.game_state['recentActions'].append(f"{player_name} played {card}")
         print(f"{player_name} played {card}")  # Log the action to the terminal
+        self.game_state['recentActions'].append(f"{player_name} played {card}")  # Log the action to the game state
+
 
     def load_leaderboard(self):
         """Loads the leaderboard from a file or creates a new one if missing."""
@@ -169,9 +173,8 @@ class GameManager:
         return [{"name": player, "wins": wins} for player, wins in sorted_leaderboard]
     
 def get_game_state(self):
-    """Returns the current game state, including player hands and leaderboard."""
+    """Returns the current state of the game."""
     return {
-        "state": self.game_state["state"],
         "players": [
             {"name": player.name, "hand": [f"{card.rank} of {card.suit}" for card in player.hand]}
             for player in self.players

@@ -207,6 +207,8 @@ async function fetchGameState() {
     }
 }
 
+let selectedCard = null; // Store the currently selected card
+let drawnCard = null;
 // Function to make cards clickable
 function makeCardsClickable() {
     const cards = document.querySelectorAll('#human-player-hand .card-icon');
@@ -217,6 +219,7 @@ function makeCardsClickable() {
 
             // Add the 'selected' class to the clicked card
             card.classList.add('selected');
+            selectedCard = card.textContent;
         });
     });
 }
@@ -239,15 +242,22 @@ async function drawCard() {
         }
 
         const data = await response.json();
+        drawnCard = data.card;
         const humanPlayerHand = document.getElementById('human-player-hand');
+        const currentCards = document.getElementById('current-cards');
 
         // Create a new card element
         const newCard = document.createElement('div');
         newCard.className = 'card-icon';
         newCard.textContent = data.card;
 
+        const newCardCurrent = document.createElement('div');
+        newCardCurrent.className = 'card';
+        newCardCurrent.textContent = data.card;
+        
         // Add the new card to the hand
         humanPlayerHand.appendChild(newCard);
+        currentCards.appendChild(newCardCurrent);
 
         // Trigger the draw animation
         newCard.style.animation = 'drawCard 0.5s ease-in-out';
@@ -269,30 +279,30 @@ async function drawCard() {
 async function playCard() {
     try {
         const humanPlayerHand = document.getElementById('human-player-hand');
-        const selectedCard = humanPlayerHand.querySelector('.card-icon.selected');
+        const currentCards = document.getElementById('current-cards');
 
         // Check if a card is selected
         if (!selectedCard) {
             alert('Please select a card to play!');
             return;
         }
-
-        const cardValue = selectedCard.textContent;
+        console.log(selectedCard);
+        const cardValue = selectedCard;
 
         // Highlight the selected card
-        selectedCard.classList.add('selected');
+        // selectedCard.classList.add('selected');
 
         // Add a short delay to allow the highlight to be visible
-        await new Promise(resolve => setTimeout(resolve, 300)); // 300ms delay
+        // await new Promise(resolve => setTimeout(resolve, 300)); // 300ms delay
 
         // Trigger the play animation
-        selectedCard.style.animation = 'playCard 0.5s ease-in-out forwards';
+        // selectedCard.style.animation = 'playCard 0.5s ease-in-out forwards';
 
         // Play sound effect for playing a card
-        playSoundEffect('sounds/play_card.mp3');
+        // playSoundEffect('sounds/play_card.mp3');
 
         // Wait for the animation to complete
-        await new Promise(resolve => setTimeout(resolve, 500)); // 500ms delay
+        // await new Promise(resolve => setTimeout(resolve, 500)); // 500ms delay
 
         // Send a request to the server to play the card
         const response = await fetch('/play_card', {
@@ -307,7 +317,21 @@ async function playCard() {
         console.log('Server response:', data); // Debug log
 
         // Remove the card from the hand
-        selectedCard.remove();
+        // selectedCard.remove();
+        const cardIconToRemove = document.querySelector('#human-player-hand .card-icon.selected');
+        const cardToRemoveTop = document.querySelector('#current-cards');
+        const cards = currentCards.querySelectorAll(".card");
+
+        for (const card of cards) {
+            if (card.textContent == selectedCard) {
+                cardToRemoveTop.removeChild(card)
+                break;
+            }
+        }
+        humanPlayerHand.removeChild(cardIconToRemove);
+
+
+        selectedCard = null;
 
         // Log the action
         logRecentAction(data.message);
