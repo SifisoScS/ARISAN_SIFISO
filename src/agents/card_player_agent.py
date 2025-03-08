@@ -13,7 +13,8 @@ class CardPlayerAgent(Agent):
     def receive_cards(self, cards):
         """Assigns a hand of cards to the player."""
         self.hand = cards
-        print(f"{self.name} ({self.strategy}) received hand: {self.hand}")
+        print(f"{self.name} ({self.strategy}) received hand: {[f'{card.rank} of {card.suit}' for card in self.hand]}")
+
 
     def choose_worst_card(self):
         """Selects the worst card to swap based on AI strategy."""

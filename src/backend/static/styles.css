@@ -1,95 +1,199 @@
 /* General Styles */
 body {
     font-family: 'Roboto', sans-serif;
-    background: #1E1E2E; /* Dark purple background */
+    background-color: #301934; /* Dark purple/maroon background */
     color: #FFFFFF; /* Primary text: white */
     margin: 0;
     padding: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    /*display: flex;  Removed - handled by .container */
+    /*flex-direction: column; Removed -handled by .container */
+    /*align-items: center;     Removed - handled by .container */
     min-height: 100vh;
 }
 
-/* Sticky Header */
-header {
-    text-align: center;
-    padding: 15px;
-    background: rgba(30, 30, 46, 0.9);
-    backdrop-filter: blur(10px);
-    color: #FFFFFF;
-    width: 100%;
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+/* Container Styles */
+.container {
+    display: flex;
+    height: 100vh;
 }
 
-header h1 {
+/* Sidebar Styles */
+.sidebar {
+    width: 180px;
+    background-color: #1e1222; /* Darker sidebar color */
+    padding: 20px;
+    /*position: fixed; Removed - handled by container*/
+    /*left: 0;      Removed - handled by container*/
+    /*top: 0;       Removed - handled by container*/
+    /*height: 100vh; Removed - handled by container*/
+    /*linear-gradient(135deg, #2E1E2E, #1E1E2E); Dark Purple Gradient */
+    /*backdrop-filter: blur(10px);  Not needed, solid color is fine*/
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    /*z-index: 100; Not needed */
+}
+
+.sidebar h1 {
+    margin-bottom: 30px;
+    text-align: center;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2em;
+    font-size: 1.5em; /* Adjust font size as needed */
 }
 
-header h1 img {
-    width: 30px;
-    height: 30px;
-    margin: 0 10px;
+.sidebar h1 img {
+    width: 24px; /* Adjust icon size */
+    height: 24px; /* Adjust icon size */
+    margin: 0 5px;  /* Smaller margin */
 }
 
-header p {
-    color: #A3A3C2;
-}
-
-/* Sidebar Navigation */
-.sidebar {
-    position: fixed;
-    left: 0;
-    top: 0;
-    height: 100vh;
-    width: 200px;
-    background: linear-gradient(135deg, #2E1E2E, #1E1E2E); /* Dark Purple Gradient */
-    backdrop-filter: blur(10px);
-    padding: 20px;
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-    z-index: 100;
-}
-
-.sidebar ul {
+.sidebar nav ul {
     list-style-type: none;
     padding: 0;
 }
 
-.sidebar ul li {
-    margin: 20px 0;
+.sidebar nav li {
+    margin-bottom: 10px;  /* Adjusted spacing */
 }
 
-.sidebar ul li a {
-    color: #FFFFFF;
+.sidebar nav a {
+    color: #eee;
     text-decoration: none;
-    display: flex;
-    align-items: center;
-    font-size: 1.1em;
-    transition: all 0.3s ease;
+    display: block;
     padding: 10px 15px;
     border-radius: 5px;
-    background: linear-gradient(135deg, #6A5ACD, #9370DB);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    margin: 10px 0;
+    /*background: linear-gradient(135deg, #6A5ACD, #9370DB); Replace with solid color */
+    background-color: #3a2641; /* A bit lighter for better contrast */
+    box-shadow: none; /* Remove the heavy shadow */
+    transition: background-color 0.3s ease;
+    font-size: 1em;
 }
 
-.sidebar ul li a:hover {
-    background: linear-gradient(135deg, #9370DB, #6A5ACD);
-    transform: scale(1.05);
-    box-shadow: 0 0 15px #9370DB;
+.sidebar nav a:hover {
+    background-color: #513b5a;  /* Slightly lighter hover */
+    transform: none; /* Remove scale */
+    box-shadow: none; /* Remove shadow */
 }
 
-.sidebar ul li a:active {
+.sidebar nav a:active {
+    transform: none;  /* Remove scale */
+}
+
+/* Main Content Styles */
+.main-content {
+    flex: 1;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.main-header {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #A3A3C2; /* Subtitle color */
+}
+
+/* Game Area Styles */
+.game-area {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.game-area h2 {
+    color: #fff; /* Set heading color */
+    margin-bottom: 10px;
+}
+
+/* Card Row Styles */
+.card-row {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+/* Basic Card Styling - Customize as needed */
+.card {
+    width: 70px;
+    height: 100px;
+    background-color: #fff;
+    color: #000;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2em; /* Adjust as needed */
+}
+
+#current-cards .card {
+    font-size: 1.0em; /* Adjust this value as needed */
+    width: 50px;
+    height: 75px;
+}
+
+/* Actions Styles */
+.actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.actions button {
+    padding: 10px 20px;
+    font-size: 1em;
+    border: none;
+    border-radius: 5px;
+    /*background: linear-gradient(135deg, #FF00FF, #00FFFF); Teal & pink*/
+    background-color: #00CED1; /* Teal */
+    color: #FFFFFF;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    box-shadow: none; /*Remove shadow */
+}
+
+.actions button:hover {
+    background-color: #00a6a8;  /* Darker teal */
+    transform: none; /* Remove scale */
+    box-shadow: none; /* Remove shadow */
+}
+
+.actions button:active {
     transform: scale(0.95);
 }
 
-/* Sidebar Toggle Button */
+/* Game State Message */
+.game-state {
+    font-style: italic;
+    color: #aaa; /* Lighter text */
+}
+
+/* Game Dashboard Styles */
+.game-dashboard {
+    /*display: grid; grid */
+    /*grid-template-columns: repeat(2, 1fr); replaced */
+    /*gap: 20px; replaced */
+    display: flex; /* Added for horizontal arrangement */
+    flex-wrap: wrap; /* Added for wrapping on smaller screens */
+    justify-content: space-around; /* Added for spacing */
+}
+
+/* Individual Dashboard Item Styles */
+.human-player, .player-hands, .leaderboard-preview, .recent-actions, .saved-decks {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 15px;
+    backdrop-filter: blur(10px);
+    margin-bottom: 20px; /* Add some space between the elements */
+    width: calc(50% - 20px); /* Adjust width to fit two elements in a row with margin */
+}
+
+.human-player h2, .player-hands h2, .leaderboard-preview h2, .recent-actions h2, .saved-decks h2 {
+    color: #00FFFF;
+    margin-bottom: 10px;
+}
+
+/* Sidebar Toggle Button Styles */
 .sidebar-toggle {
     display: none;
     background: none;
@@ -104,67 +208,43 @@ header p {
 }
 
 @media screen and (max-width: 768px) {
+    .container {
+        flex-direction: column; /* Stack sidebar and content vertically */
+    }
+
     .sidebar {
-        display: none;
+        width: 100%; /* Take full width on small screens */
+        position: static; /* Allow it to flow in the document */
+        display: none;  /* Hide by default */
+        height: auto;  /* Adjust as needed */
     }
 
     .sidebar.active {
-        display: block;
+        display: block; /* Show when toggled */
     }
 
     .sidebar-toggle {
-        display: block;
+        display: block; /* Always show the toggle button */
+    }
+
+    .main-content {
+        padding-top: 60px; /* Adjust for toggle button height */
+    }
+
+    .game-dashboard {
+        flex-direction: column; /* Stack dashboard items vertically */
+    }
+
+    .human-player, .player-hands, .leaderboard-preview, .recent-actions, .saved-decks {
+        width: 100%; /* Take full width on small screens */
     }
 }
 
-/* Main Container */
-main {
-    width: 80%;
-    max-width: 800px;
-    padding: 20px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    margin-top: 20px;
-    margin-left: 220px; 
-    backdrop-filter: blur(10px);
-}
-
-/* Button Container */
-.button-container {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-}
-
-button {
-    padding: 10px 15px;
-    font-size: 1em;
-    border: none;
-    border-radius: 5px;
-    background: linear-gradient(135deg, #FF00FF, #00FFFF);
-    color: #FFFFFF;
-    cursor: pointer;
-    transition: all 0.3s ease-in-out;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-button:hover {
-    transform: scale(1.1);
-    box-shadow: 0 0 15px #FF00FF;
-}
-
-button:active {
-    transform: scale(0.95);
-}
-
+/* Other Styles (Keep as-is or adjust) */
 /* Success Message */
 #success-message {
     font-size: 1.2em;
-    color: #00FFFF; 
+    color: #00FFFF;
     margin-top: 20px;
     opacity: 0;
     transition: opacity 0.5s ease-in-out;
@@ -194,7 +274,7 @@ button:active {
     display: none;
     margin: 10px auto;
     border: 4px solid rgba(255, 255, 255, 0.1);
-    border-top: 4px solid #00FFFF; 
+    border-top: 4px solid #00FFFF;
     border-radius: 50%;
     width: 30px;
     height: 30px;
@@ -237,54 +317,6 @@ ul li {
 
 ul li:last-child {
     border-bottom: none;
-}
-
-/* Game Status Dashboard */
-.game-dashboard {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-}
-
-.game-state, .player-hands, .leaderboard-preview, .recent-actions {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    padding: 15px;
-    backdrop-filter: blur(10px);
-}
-
-.game-state h2, .player-hands h2, .leaderboard-preview h2, .recent-actions h2 {
-    color: #00FFFF; 
-    margin-bottom: 10px;
-}
-
-#game-state {
-    font-size: 1.2em;
-    color: #FF00FF; 
-}
-
-#player-hands, #leaderboard-preview, #recent-actions {
-    color: #A3A3C2; 
-}
-
-#recent-actions {
-    max-height: 100px;
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: #FF00FF #1E1E2E;
-}
-
-#recent-actions::-webkit-scrollbar {
-    width: 6px;
-}
-
-#recent-actions::-webkit-scrollbar-thumb {
-    background: #FF00FF; 
-    border-radius: 3px;
-}
-
-#recent-actions::-webkit-scrollbar-track {
-    background: #1E1E2E; 
 }
 
 /* Human Player Section */
@@ -373,6 +405,7 @@ ul li:last-child {
     animation: winGame 1s ease-in-out;
 }
 
+/* Saved Decks Styles */
 .saved-decks {
     background-color: #f9f9f9;
     border: 1px solid #ddd;

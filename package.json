@@ -1,0 +1,29 @@
+{
+  "name": "arisan_sifiso",
+  "version": "1.0.0",
+  "description": "An AI-powered system with multi-agent collaboration for planning, data processing, and external integration via API & CLI.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SifisoScS/ARISAN_SIFISO.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/SifisoScS/ARISAN_SIFISO/issues"
+  },
+  "homepage": "https://github.com/SifisoScS/ARISAN_SIFISO#readme",
+  "dependencies": {
+    "bootstrap": "^5.3.3",
+    "lucide-react": "^0.479.0",
+    "react": "^19.0.0",
+    "react-bootstrap": "^2.10.9",
+    "react-dom": "^19.0.0",
+    "react-scripts": "^5.0.1"
+  }
+}
