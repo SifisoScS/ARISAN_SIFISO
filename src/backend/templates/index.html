@@ -19,12 +19,12 @@
             </h1>
             <nav>
                 <ul>
-                    <li><a href="#">Home</a></li>
-                    <li><a href="#" onclick="startGame()">Start Game</a></li>
-                    <li><a href="#" onclick="resetGame()">Reset Game</a></li>
-                    <li><a href="#" onclick="viewPlayers()">View Players</a></li>
-                    <li><a href="#" onclick="showLeaderboard()">Leaderboard</a></li>
-                    <li><a href="#" onclick="openDeckBuilder()">Deck Builder</a></li>
+                    <li><a href="#"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="#" onclick="startGame()"><i class="fas fa-play"></i> Start Game</a></li>
+                    <li><a href="#" onclick="resetGame()"><i class="fas fa-sync-alt"></i> Reset Game</a></li>
+                    <li><a href="#" onclick="viewPlayers()"><i class="fas fa-users"></i> View Players</a></li>
+                    <li><a href="#" onclick="showLeaderboard()"><i class="fas fa-trophy"></i> Leaderboard</a></li>
+                    <li><a href="#" onclick="openDeckBuilder()"><i class="fas fa-layer-group"></i> Deck Builder</a></li>
                 </ul>
             </nav>
         </aside>
@@ -57,7 +57,9 @@
             <section class="game-dashboard">
                 <div class="human-player">
                     <h2>Your Hand</h2>
-                    <div id="human-player-hand" class="player-hand"></div>
+                    <div id="human-player-hand" class="player-hand">
+                        <!-- Cards will be dynamically added here -->
+                    </div>
                 </div>
 
                 <div id="game-results" class="results-container"></div>

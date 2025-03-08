@@ -75,33 +75,38 @@ function hideLoader() {
 }
 
 // Function to start the game
-function startGame() {
-    showLoader();
-    fetch('/start_game', { method: 'POST' })
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('game-results').innerHTML = data.message;
-            document.getElementById('game-results').classList.add('show');
-            fetchGameState(); // Fetch game state after starting
-        })
-        .catch(error => console.error("Error:", error))
-        .finally(() => hideLoader());
+async function startGame() {
+    try {
+        showLoader();
+        const response = await fetch('/start_game', { method: 'POST' });
+        const data = await response.json();
+        document.getElementById('game-results').innerHTML = data.message;
+        document.getElementById('game-results').classList.add('show');
+        await fetchGameState(); // Fetch game state after starting
+    } catch (error) {
+        console.error("Error:", error);
+    } finally {
+        hideLoader();
+    }
 }
 
 // Function to reset the game
-function resetGame() {
-    showLoader();
-    fetch('/reset_game', { method: 'POST' })
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById("success-message").classList.add("show");
-            setTimeout(() => {
-                document.getElementById("success-message").classList.remove("show");
-            }, 2000);
-            document.getElementById('game-results').classList.remove('show');
-        })
-        .catch(error => console.error("Error:", error))
-        .finally(() => hideLoader());
+async function resetGame() {
+    try {
+        showLoader();
+        const response = await fetch('/reset_game', { method: 'POST' });
+        const data = await response.json();
+        document.getElementById("success-message").classList.add("show");
+        setTimeout(() => {
+            document.getElementById("success-message").classList.remove("show");
+        }, 2000);
+        document.getElementById('game-results').classList.remove('show');
+        await fetchGameState(); // Fetch game state after reset
+    } catch (error) {
+        console.error("Error:", error);
+    } finally {
+        hideLoader();
+    }
 }
 
 // Function to fetch and display players
@@ -180,35 +185,47 @@ async function showLeaderboard() {
 // Function to fetch and display the game state
 async function fetchGameState() {
     try {
-        console.log('Fetching game state...');
-        const response = await fetch('http://127.0.0.1:5000/game_state'); // Full URL
+        const response = await fetch('/game_state');
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const gameState = await response.json();
-        console.log('Game state data:', gameState);
 
         // Update the game state display
         updateGameState(gameState.state);
 
-        // Update player hands
+        // Update player hands in the "other-info" section
         updatePlayerHands(gameState.players);
 
-        // Update leaderboard preview
+        // Update leaderboard preview in the "other-info" section
         updateLeaderboardPreview(gameState.leaderboard);
 
-        // Log recent actions
+        // Update recent actions in the "other-info" section
         updateRecentActions(gameState.recentActions);
 
-        // Add or remove glowing effect based on game state
-        setGameActive(gameState.state === 'in_progress');
+        // Update Human Player's Hand
+        updateHumanPlayerHand(gameState.players.find(player => player.name === "Human Player")?.hand || []);
     } catch (error) {
         console.error('Error fetching game state:', error);
     }
 }
 
-let selectedCard = null; // Store the currently selected card
-let drawnCard = null;
+function updateHumanPlayerHand(hand) {
+    const humanPlayerHandElement = document.getElementById('human-player-hand');
+    humanPlayerHandElement.innerHTML = hand.map(cardText => {
+        const parts = cardText.split(' '); // Split the card text into parts
+        const rank = parts[0]; // The rank is the first part
+        const suit = parts[parts.length - 1]; // The suit is the last part
+        return `
+            <div class="card-icon">
+                <span class="rank">${rank}</span>
+                <span class="suit">${suit}</span>
+            </div>
+        `;
+    }).join('');
+    makeCardsClickable();
+}
+
 // Function to make cards clickable
 function makeCardsClickable() {
     const cards = document.querySelectorAll('#human-player-hand .card-icon');
@@ -242,31 +259,9 @@ async function drawCard() {
         }
 
         const data = await response.json();
-        drawnCard = data.card;
-        const humanPlayerHand = document.getElementById('human-player-hand');
-        const currentCards = document.getElementById('current-cards');
 
-        // Create a new card element
-        const newCard = document.createElement('div');
-        newCard.className = 'card-icon';
-        newCard.textContent = data.card;
-
-        const newCardCurrent = document.createElement('div');
-        newCardCurrent.className = 'card';
-        newCardCurrent.textContent = data.card;
-        
-        // Add the new card to the hand
-        humanPlayerHand.appendChild(newCard);
-        currentCards.appendChild(newCardCurrent);
-
-        // Trigger the draw animation
-        newCard.style.animation = 'drawCard 0.5s ease-in-out';
-
-        // Play sound effect for drawing a card
-        playSoundEffect('sounds/draw_card.mp3');
-
-        // Make the new card clickable
-        makeCardsClickable();
+        // Refresh the game state to reflect the new card in the hand
+        await fetchGameState();
     } catch (error) {
         console.error('Error drawing card:', error);
         alert(error.message); // Show an error message to the user
@@ -278,69 +273,46 @@ async function drawCard() {
 // Function to play a specific card
 async function playCard() {
     try {
-        const humanPlayerHand = document.getElementById('human-player-hand');
-        const currentCards = document.getElementById('current-cards');
-
+        showLoader();
         // Check if a card is selected
         if (!selectedCard) {
             alert('Please select a card to play!');
             return;
         }
-        console.log(selectedCard);
-        const cardValue = selectedCard;
 
-        // Highlight the selected card
-        // selectedCard.classList.add('selected');
-
-        // Add a short delay to allow the highlight to be visible
-        // await new Promise(resolve => setTimeout(resolve, 300)); // 300ms delay
-
-        // Trigger the play animation
-        // selectedCard.style.animation = 'playCard 0.5s ease-in-out forwards';
-
-        // Play sound effect for playing a card
-        // playSoundEffect('sounds/play_card.mp3');
-
-        // Wait for the animation to complete
-        // await new Promise(resolve => setTimeout(resolve, 500)); // 500ms delay
-
-        // Send a request to the server to play the card
         const response = await fetch('/play_card', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ player_name: 'Human Player', card: cardValue }),
+            body: JSON.stringify({ player_name: 'Human Player', card: selectedCard }),
         });
 
-        const data = await response.json();
-        console.log('Server response:', data); // Debug log
-
-        // Remove the card from the hand
-        // selectedCard.remove();
-        const cardIconToRemove = document.querySelector('#human-player-hand .card-icon.selected');
-        const cardToRemoveTop = document.querySelector('#current-cards');
-        const cards = currentCards.querySelectorAll(".card");
-
-        for (const card of cards) {
-            if (card.textContent == selectedCard) {
-                cardToRemoveTop.removeChild(card)
-                break;
-            }
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to play card');
         }
-        humanPlayerHand.removeChild(cardIconToRemove);
 
+        const data = await response.json();
 
+        // Refresh the game state to reflect the played card
+        await fetchGameState();
+
+        // Clear selected card after playing
         selectedCard = null;
-
-        // Log the action
-        logRecentAction(data.message);
     } catch (error) {
         console.error('Error playing card:', error);
         alert(error.message); // Show an error message to the user
     } finally {
         hideLoader();
     }
+}
+
+// Function to update recent actions
+function updateRecentActions(actions) {
+    const recentActionsElement = document.getElementById('recent-actions');
+    recentActionsElement.innerHTML = actions.map(action => `<div>${action}</div>`).join('');
+    recentActionsElement.scrollTop = recentActionsElement.scrollHeight; // Auto-scroll to the latest action
 }
 
 // Function to handle winning the game
@@ -537,5 +509,5 @@ function loadDeckIntoGame(deck) {
     makeCardsClickable();
 }
 
-// Poll the backend for updates every 5 seconds
-setInterval(fetchGameState, 5000);
+// Fetch the initial game state on page load
+document.addEventListener('DOMContentLoaded', fetchGameState);
