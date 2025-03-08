@@ -49,13 +49,15 @@ def leaderboard():
 @app.route('/draw_card', methods=['POST'])
 def draw_card():
     player_name = request.json.get('player_name')
-    print(f"Received request to draw a card for: {player_name}")  # Added debug print
     try:
         card = game_manager.draw_card(player_name)
-        return jsonify({"card": f"{card.rank} of {card.suit}"})  # Return the card as a string
+        # Added suit mappings
+        suit_symbols = {"Clubs": "♣", "Diamonds": "♦", "Hearts": "♥", "Spades": "♠"}
+        suit_symbol = suit_symbols.get(card.suit, card.suit)  # Use the symbol or default to the name
+
+        return jsonify({"card": f"{card.rank} {suit_symbol}"})  # Return the card as a string
     except ValueError as e:
-        print(f"Error occurred: {str(e)}")  # Added logging for errors
-        return jsonify({"error": str(e)}), 400  # Return an error message if something goes wrong
+        return jsonify({"error": str(e)}), 400
 
 @app.route('/play_card', methods=['POST'])
 def play_card():

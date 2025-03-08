@@ -465,3 +465,39 @@ ul li:last-child {
 .saved-deck .deck-actions button:hover {
     background-color: #0056b3;
 }
+
+.card-icon {
+    display: inline-block;
+    width: 60px;
+    height: 80px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    text-align: center;
+    font-size: 1.2em;
+    margin: 5px;
+    position: relative; /* For positioning the suit */
+    background-color: #fff; /* White card background */
+    color: #000; /* Black card text */
+    overflow: hidden; /* Prevent text from overflowing */
+    transition: all 0.3s ease; /* Add a smooth transition for selection effect */
+}
+
+.card-icon .rank {
+    display: block;
+    font-size: 1.2em;
+    padding-top: 10px;
+    word-break: break-all; /* Break long words */
+}
+
+.card-icon .suit {
+    position: absolute;
+    bottom: 5px;
+    left: 5px;
+    font-size: 0.8em;
+}
+
+.card-icon.selected {
+    border: 2px solid #007bff; /* Add a blue border when selected */
+    transform: scale(1.1); /* Slightly enlarge the card when selected */
+    box-shadow: 0 0 5px #007bff; /* Add a subtle shadow when selected */
+}
