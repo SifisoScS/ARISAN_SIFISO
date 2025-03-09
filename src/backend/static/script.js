@@ -181,49 +181,11 @@ async function showLeaderboard() {
         hideLoader();
     }
 }
-
-// Function to fetch and display the game state
-async function fetchGameState() {
-    try {
-        const response = await fetch('/game_state');
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        const gameState = await response.json();
-
-        // Update the game state display
-        updateGameState(gameState.state);
-
-        // Update player hands in the "other-info" section
-        updatePlayerHands(gameState.players);
-
-        // Update leaderboard preview in the "other-info" section
-        updateLeaderboardPreview(gameState.leaderboard);
-
-        // Update recent actions in the "other-info" section
-        updateRecentActions(gameState.recentActions);
-
-        // Update Human Player's Hand
-        updateHumanPlayerHand(gameState.players.find(player => player.name === "Human Player")?.hand || []);
-    } catch (error) {
-        console.error('Error fetching game state:', error);
-    }
-}
-
-function updateHumanPlayerHand(hand) {
-    const humanPlayerHandElement = document.getElementById('human-player-hand');
-    humanPlayerHandElement.innerHTML = hand.map(cardText => {
-        const parts = cardText.split(' '); // Split the card text into parts
-        const rank = parts[0]; // The rank is the first part
-        const suit = parts[parts.length - 1]; // The suit is the last part
-        return `
-            <div class="card-icon">
-                <span class="rank">${rank}</span>
-                <span class="suit">${suit}</span>
-            </div>
-        `;
-    }).join('');
-    makeCardsClickable();
+// Function to update recent actions
+function updateRecentActions(actions) {
+    const recentActionsElement = document.getElementById('recent-actions');
+    recentActionsElement.innerHTML = actions.map(action => `<div>${action}</div>`).join('');
+    recentActionsElement.scrollTop = recentActionsElement.scrollHeight; // Auto-scroll to the latest action
 }
 
 // Function to make cards clickable
@@ -308,11 +270,110 @@ async function playCard() {
     }
 }
 
-// Function to update recent actions
-function updateRecentActions(actions) {
-    const recentActionsElement = document.getElementById('recent-actions');
-    recentActionsElement.innerHTML = actions.map(action => `<div>${action}</div>`).join('');
-    recentActionsElement.scrollTop = recentActionsElement.scrollHeight; // Auto-scroll to the latest action
+// Function to update the Human Player's hand
+function updateHumanPlayerHand(hand) {
+    const humanPlayerHandElement = document.getElementById('human-player-hand');
+    humanPlayerHandElement.innerHTML = hand.map(cardText => {
+        const parts = cardText.split(' '); // Assuming card is in the format "Rank Suit"
+        const rank = parts[0]; // The rank is the first part
+        const suit = parts[parts.length - 1]; // The suit is the last part
+        return `
+            <div class="card-icon">
+                <span class="rank">${rank}</span>
+                <span class="suit">${suit}</span>
+            </div>
+        `;
+    }).join('');
+    makeCardsClickable();
+}
+
+// Function to fetch and display the game state
+async function fetchGameState() {
+    try {
+        const response = await fetch('/game_state');
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const gameState = await response.json();
+
+        // Compare the new game state with the previous game state
+        if (!areGameStatesEqual(previousGameState, gameState)) {
+
+            // Update the game state display
+            updateGameState(gameState.state);
+
+            // Update player hands in the "other-info" section
+            updatePlayerHands(gameState.players);
+
+            // Update leaderboard preview in the "other-info" section
+            updateLeaderboardPreview(gameState.leaderboard);
+
+            // Update recent actions in the "other-info" section
+            updateRecentActions(gameState.recentActions);
+
+            // Update Human Player's Hand
+            updateHumanPlayerHand(gameState.players.find(player => player.name === "Human Player")?.hand || []);
+            previousGameState = gameState;
+        }
+            document.getElementById('player-turn').textContent = gameState.currentPlayerTurn;
+            document.getElementById('deck-size').textContent = gameState.deckSize;
+            document.getElementById('played-cards').textContent = gameState.playedCards;
+        } catch (error) {
+                console.error('Error fetching game state:', error);
+            }
+        
+    }
+
+function areGameStatesEqual(gameState1, gameState2) {
+    // If either game state is null or undefined, consider them not equal
+    if (!gameState1 || !gameState2) {
+        return false;
+    }
+
+    // Compare the state property
+    if (gameState1.state !== gameState2.state) {
+        return false;
+    }
+
+    // Compare the recentActions array
+    if (gameState1.recentActions.length !== gameState2.recentActions.length) {
+        return false;
+    }
+    for (let i = 0; i < gameState1.recentActions.length; i++) {
+        if (gameState1.recentActions[i] !== gameState2.recentActions[i]) {
+            return false;
+        }
+    }
+
+    // Compare the leaderboard array
+    if (gameState1.leaderboard.length !== gameState2.leaderboard.length) {
+        return false;
+    }
+    for (let i = 0; i < gameState1.leaderboard.length; i++) {
+        if (gameState1.leaderboard[i].name !== gameState2.leaderboard[i].name ||
+            gameState1.leaderboard[i].wins !== gameState2.leaderboard[i].wins) {
+            return false;
+        }
+    }
+
+    // Compare the players array
+    if (gameState1.players.length !== gameState2.players.length) {
+        return false;
+    }
+    for (let i = 0; i < gameState1.players.length; i++) {
+        if (gameState1.players[i].name !== gameState2.players[i].name ||
+            gameState1.players[i].hand.length !== gameState2.players[i].hand.length) {
+            return false;
+        }
+        for (let j = 0; j < gameState1.players[i].hand.length; j++) {
+            if (gameState1.players[i].hand[j] !== gameState2.players[i].hand[j]) {
+                return false;
+            }
+        }
+    }
+
+    // If all checks pass, consider the game states equal
+    return true;
 }
 
 // Function to handle winning the game
@@ -510,4 +571,63 @@ function loadDeckIntoGame(deck) {
 }
 
 // Fetch the initial game state on page load
-document.addEventListener('DOMContentLoaded', fetchGameState);
+document.addEventListener('DOMContentLoaded', loadGame);
+
+function loadGame() {
+    makeCardsClickable();
+};
+
+setInterval(fetchGameState, 5000);
+let previousGameState = null;
+
+function areGameStatesEqual(gameState1, gameState2) {
+    // If either game state is null or undefined, consider them not equal
+    if (!gameState1 || !gameState2) {
+        return false;
+    }
+
+    // Compare the state property
+    if (gameState1.state !== gameState2.state) {
+        return false;
+    }
+
+    // Compare the recentActions array
+    if (gameState1.recentActions.length !== gameState2.recentActions.length) {
+        return false;
+    }
+    for (let i = 0; i < gameState1.recentActions.length; i++) {
+        if (gameState1.recentActions[i] !== gameState2.recentActions[i]) {
+            return false;
+        }
+    }
+
+    // Compare the leaderboard array
+    if (gameState1.leaderboard.length !== gameState2.leaderboard.length) {
+        return false;
+    }
+    for (let i = 0; i < gameState1.leaderboard.length; i++) {
+        if (gameState1.leaderboard[i].name !== gameState2.leaderboard[i].name ||
+            gameState1.leaderboard[i].wins !== gameState2.leaderboard[i].wins) {
+            return false;
+        }
+    }
+
+    // Compare the players array
+    if (gameState1.players.length !== gameState2.players.length) {
+        return false;
+    }
+    for (let i = 0; i < gameState1.players.length; i++) {
+        if (gameState1.players[i].name !== gameState2.players[i].name ||
+            gameState1.players[i].hand.length !== gameState2.players[i].hand.length) {
+            return false;
+        }
+        for (let j = 0; j < gameState1.players[i].hand.length; j++) {
+            if (gameState1.players[i].hand[j] !== gameState2.players[i].hand[j]) {
+                return false;
+            }
+        }
+    }
+
+    // If all checks pass, consider the game states equal
+    return true;
+}
