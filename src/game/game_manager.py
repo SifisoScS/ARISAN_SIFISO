@@ -33,7 +33,8 @@ class GameManager:
             "state": "in_progress",
             "players": [],
             "leaderboard": [],
-            "recentActions": []
+            "recentActions": [],
+            "activeRuleShifts": []  # Track active rule shifts
         }
 
     def deal_cards(self):
@@ -104,7 +105,6 @@ class GameManager:
         print(f"{player_name}'s hand after drawing: {[f'{c.rank} of {c.suit}' for c in player.hand]}")  # Debug print
         return card
 
-
     def play_card(self, player_name, card):
         """
         Plays a card from the specified player's hand.
@@ -122,7 +122,6 @@ class GameManager:
         # Find the card in the player's hand
         card_found = next((c for c in player.hand if f"{c.rank} of {c.suit}" == card), None)
 
-
         if not card_found:
             raise ValueError(f"Card '{card}' not found in {player_name}'s hand!")
 
@@ -131,11 +130,7 @@ class GameManager:
 
         # Log the action and update game state
         self.game_state['recentActions'].append(f"{player_name} played {card}")
-
-        self.game_state['recentActions'].append(f"{player_name} played {card}")
         print(f"{player_name} played {card}")  # Log the action to the terminal
-        self.game_state['recentActions'].append(f"{player_name} played {card}")  # Log the action to the game state
-
 
     def load_leaderboard(self):
         """Loads the leaderboard from a file or creates a new one if missing."""
@@ -171,14 +166,37 @@ class GameManager:
         """Returns a **sorted global leaderboard** for all past games."""
         sorted_leaderboard = sorted(self.leaderboard.items(), key=lambda x: x[1], reverse=True)
         return [{"name": player, "wins": wins} for player, wins in sorted_leaderboard]
-    
-def get_game_state(self):
-    """Returns the current state of the game."""
-    return {
-        "players": [
-            {"name": player.name, "hand": [f"{card.rank} of {card.suit}" for card in player.hand]}
-            for player in self.players
-        ],
-        "leaderboard": self.get_leaderboard(),
-        "recentActions": self.game_state["recentActions"]
-    }
+
+    def get_game_state(self):
+        """Returns the current state of the game."""
+        return {
+            "players": [
+                {"name": player.name, "hand": [f"{card.rank} of {card.suit}" for card in player.hand]}
+                for player in self.players
+            ],
+            "leaderboard": self.get_leaderboard(),
+            "recentActions": self.game_state["recentActions"],
+            "activeRuleShifts": self.game_state["activeRuleShifts"]  # Include active rule shifts
+        }
+
+    def apply_rule_shift(self, rule_shift):
+        """
+        Applies a rule shift to the game state.
+        Args:
+            rule_shift (dict): The rule shift to apply, containing `name`, `description`, `applyEffect`, and `removeEffect`.
+        """
+        rule_shift["applyEffect"](self.game_state)
+        self.game_state["activeRuleShifts"].append(rule_shift)
+        self.game_state["recentActions"].append(f"Rule Shift Applied: {rule_shift['name']}")
+
+    def remove_rule_shift(self, rule_shift):
+        """
+        Removes a rule shift from the game state.
+        Args:
+            rule_shift (dict): The rule shift to remove.
+        """
+        rule_shift["removeEffect"](self.game_state)
+        self.game_state["activeRuleShifts"] = [
+            rs for rs in self.game_state["activeRuleShifts"] if rs["name"] != rule_shift["name"]
+        ]
+        self.game_state["recentActions"].append(f"Rule Shift Removed: {rule_shift['name']}")

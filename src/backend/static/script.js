@@ -36,6 +36,18 @@ function updatePlayerHands(players) {
     `).join('');
 }
 
+// Function to update played cards
+function updatePlayedCard(card) {
+    const playedCardElement = document.getElementById('played-card');
+    if (playedCardElement) {
+        playedCardElement.innerHTML = `
+            <div class="card">
+                ${card}
+            </div>
+        `;
+    }
+}
+
 // Function to update the leaderboard preview
 function updateLeaderboardPreview(leaderboard) {
     const leaderboardPreviewElement = document.getElementById('leaderboard-preview');
@@ -181,6 +193,7 @@ async function showLeaderboard() {
         hideLoader();
     }
 }
+
 // Function to update recent actions
 function updateRecentActions(actions) {
     const recentActionsElement = document.getElementById('recent-actions');
@@ -288,6 +301,9 @@ function updateHumanPlayerHand(hand) {
 }
 
 // Function to fetch and display the game state
+let playedCard = [];
+let previousGameState = null;
+
 async function fetchGameState() {
     try {
         const response = await fetch('/game_state');
@@ -298,7 +314,6 @@ async function fetchGameState() {
 
         // Compare the new game state with the previous game state
         if (!areGameStatesEqual(previousGameState, gameState)) {
-
             // Update the game state display
             updateGameState(gameState.state);
 
@@ -313,29 +328,41 @@ async function fetchGameState() {
 
             // Update Human Player's Hand
             updateHumanPlayerHand(gameState.players.find(player => player.name === "Human Player")?.hand || []);
+
+            // Update active rule shifts
+            updateActiveRules(gameState.activeRuleShifts);
+
             previousGameState = gameState;
         }
-            document.getElementById('player-turn').textContent = gameState.currentPlayerTurn;
-            document.getElementById('deck-size').textContent = gameState.deckSize;
-            document.getElementById('played-cards').textContent = gameState.playedCards;
-        } catch (error) {
-                console.error('Error fetching game state:', error);
-            }
-        
-    }
 
+        document.getElementById('player-turn').textContent = gameState.currentPlayerTurn;
+        document.getElementById('deck-size').textContent = gameState.deckSize;
+        updatePlayedCard(playedCard);
+    } catch (error) {
+        console.error('Error fetching game state:', error);
+    }
+}
+
+// Function to update active rule shifts
+function updateActiveRules(rules) {
+    const activeRulesElement = document.getElementById('active-rules');
+    if (activeRulesElement) {
+        activeRulesElement.innerHTML = rules.map(rule => `
+            <div>
+                <strong>${rule.name}:</strong> ${rule.description}
+            </div>
+        `).join('');
+    }
+}
+
+// Function to compare game states
 function areGameStatesEqual(gameState1, gameState2) {
-    // If either game state is null or undefined, consider them not equal
     if (!gameState1 || !gameState2) {
         return false;
     }
-
-    // Compare the state property
     if (gameState1.state !== gameState2.state) {
         return false;
     }
-
-    // Compare the recentActions array
     if (gameState1.recentActions.length !== gameState2.recentActions.length) {
         return false;
     }
@@ -344,8 +371,6 @@ function areGameStatesEqual(gameState1, gameState2) {
             return false;
         }
     }
-
-    // Compare the leaderboard array
     if (gameState1.leaderboard.length !== gameState2.leaderboard.length) {
         return false;
     }
@@ -355,8 +380,6 @@ function areGameStatesEqual(gameState1, gameState2) {
             return false;
         }
     }
-
-    // Compare the players array
     if (gameState1.players.length !== gameState2.players.length) {
         return false;
     }
@@ -371,8 +394,6 @@ function areGameStatesEqual(gameState1, gameState2) {
             }
         }
     }
-
-    // If all checks pass, consider the game states equal
     return true;
 }
 
@@ -380,19 +401,324 @@ function areGameStatesEqual(gameState1, gameState2) {
 function handleWin() {
     const gameStateElement = document.getElementById('game-state');
     gameStateElement.classList.add('win-animation');
-
-    // Play sound effect for winning the game
     playSoundEffect('sounds/win_game.mp3');
-
-    // Remove the animation after it completes
     setTimeout(() => {
         gameStateElement.classList.remove('win-animation');
     }, 1000);
 }
 
+// Function to generate rule shifts
+function generateRuleShift() {
+    const ruleShifts = [
+        {
+            name: "Double Risk Mode",
+            description: "All card values are doubled for this turn! Take risks but beware!",
+            applyEffect: (gameState) => {
+                gameState.players.forEach(player => {
+                    player.hand.forEach(card => {
+                        card.value *= 2; // Double card values
+                    });
+                });
+            },
+            removeEffect: (gameState) => {
+                gameState.players.forEach(player => {
+                    player.hand.forEach(card => {
+                        card.value /= 2; // Revert card values
+                    });
+                });
+            },
+            target: 'All Cards'
+        },
+        {
+            name: "Sudden Swap",
+            description: "All players randomly swap hands! Adapt quickly!",
+            applyEffect: (gameState) => {
+                const hands = gameState.players.map(player => player.hand);
+                for (let i = hands.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [hands[i], hands[j]] = [hands[j], hands[i]];
+                }
+                gameState.players.forEach((player, index) => {
+                    player.hand = hands[index];
+                });
+            },
+            removeEffect: (gameState) => {
+                // No need to revert; the swap is permanent for the turn
+            },
+            target: 'All Hands'
+        },
+        {
+            name: "Reverse Play Order",
+            description: "The play order is reversed for this round!",
+            applyEffect: (gameState) => {
+                gameState.players.reverse(); // Reverse player order
+            },
+            removeEffect: (gameState) => {
+                gameState.players.reverse(); // Revert player order
+            },
+            target: 'Play Order'
+        },
+        {
+            name: "Wildcard Round",
+            description: "All cards are considered wildcards for this turn!",
+            applyEffect: (gameState) => {
+                gameState.players.forEach(player => {
+                    player.hand.forEach(card => {
+                        card.isWildcard = true; // Mark cards as wildcards
+                    });
+                });
+            },
+            removeEffect: (gameState) => {
+                gameState.players.forEach(player => {
+                    player.hand.forEach(card => {
+                        card.isWildcard = false; // Revert wildcard status
+                    });
+                });
+            },
+            target: 'All Cards'
+        },
+        {
+            name: "Steal a Card",
+            description: "Each player steals a random card from another player's hand!",
+            applyEffect: (gameState) => {
+                gameState.players.forEach(player => {
+                    const otherPlayers = gameState.players.filter(p => p !== player);
+                    const randomPlayer = otherPlayers[Math.floor(Math.random() * otherPlayers.length)];
+                    const randomCard = randomPlayer.hand.splice(Math.floor(Math.random() * randomPlayer.hand.length), 1)[0];
+                    player.hand.push(randomCard);
+                });
+            },
+            removeEffect: (gameState) => {
+                // No need to revert; the swap is permanent for the turn
+            },
+            target: 'All Hands'
+        },
+        {
+            name: "Double Draw",
+            description: "Players draw two cards instead of one this turn!",
+            applyEffect: (gameState) => {
+                gameState.players.forEach(player => {
+                    const drawnCards = gameState.deck.splice(0, 2); // Draw two cards
+                    player.hand.push(...drawnCards);
+                });
+            },
+            removeEffect: (gameState) => {
+                // No need to revert; the cards remain in players' hands
+            },
+            target: 'Deck'
+        },
+        {
+            name: "Freeze Hand",
+            description: "Players cannot play cards this turn!",
+            applyEffect: (gameState) => {
+                gameState.players.forEach(player => {
+                    player.canPlay = false; // Disable playing cards
+                });
+            },
+            removeEffect: (gameState) => {
+                gameState.players.forEach(player => {
+                    player.canPlay = true; // Re-enable playing cards
+                });
+            },
+            target: 'All Players'
+        },
+        {
+            name: "Power Surge",
+            description: "All face cards (Jack, Queen, King) gain double value this turn!",
+            applyEffect: (gameState) => {
+                gameState.players.forEach(player => {
+                    player.hand.forEach(card => {
+                        if (['Jack', 'Queen', 'King'].includes(card.rank)) {
+                            card.value *= 2; // Double value for face cards
+                        }
+                    });
+                });
+            },
+            removeEffect: (gameState) => {
+                gameState.players.forEach(player => {
+                    player.hand.forEach(card => {
+                        if (['Jack', 'Queen', 'King'].includes(card.rank)) {
+                            card.value /= 2; // Revert value for face cards
+                        }
+                    });
+                });
+            },
+            target: 'Face Cards'
+        },
+        {
+            name: "Chaos Mode",
+            description: "All cards are shuffled back into the deck, and players are dealt new hands!",
+            applyEffect: (gameState) => {
+                // Reshuffle all cards back into the deck
+                gameState.deck = [];
+                gameState.players.forEach(player => {
+                    gameState.deck.push(...player.hand);
+                    player.hand = [];
+                });
+                gameState.deck = shuffleArray(gameState.deck); // Shuffle the deck
+
+                // Redeal cards to players
+                gameState.players.forEach(player => {
+                    player.hand = gameState.deck.splice(0, 5); // Deal 5 cards
+                });
+            },
+            removeEffect: (gameState) => {
+                // No need to revert; the new hands are permanent
+            },
+            target: 'Deck and Hands'
+        }
+    ];
+
+    // Randomly select a rule shift
+    const randomIndex = Math.floor(Math.random() * ruleShifts.length);
+    return ruleShifts[randomIndex];
+}
+
+// Function to use a saved deck
+function useDeck(index) {
+    const selectedDeck = savedDecks[index];
+    alert(`Using deck: ${selectedDeck.name}`);
+
+    // Load the deck into the player's hand
+    loadDeckIntoGame(selectedDeck);
+}
+
+// Function to delete a saved deck
+function deleteDeck(index) {
+    if (confirm('Are you sure you want to delete this deck?')) {
+        savedDecks.splice(index, 1);
+        displaySavedDecks(); // Refresh the saved decks list
+    }
+}
+
+// Function to load a deck into the game
+function loadDeckIntoGame(deck) {
+    // Clear the current hand
+    const humanPlayerHand = document.getElementById('human-player-hand');
+    humanPlayerHand.innerHTML = '';
+
+    // Add cards from the deck to the player's hand
+    deck.cards.forEach(card => {
+        const cardElement = document.createElement('div');
+        cardElement.className = 'card-icon';
+        cardElement.textContent = card;
+        humanPlayerHand.appendChild(cardElement);
+    });
+
+    // Make the new cards clickable
+    makeCardsClickable();
+}
+
+// Function to display saved decks
+function displaySavedDecks() {
+    const savedDecksContainer = document.getElementById('saved-decks');
+    if (savedDecksContainer) {
+        savedDecksContainer.innerHTML = savedDecks.map((deck, index) => `
+            <div class="saved-deck" onclick="useDeck(${index})">
+                <strong>${deck.name}</strong>
+                <div class="deck-actions">
+                    <button onclick="useDeck(${index})">Use</button>
+                    <button onclick="deleteDeck(${index})">Delete</button>
+                </div>
+            </div>
+        `).join('');
+    }
+}
+
+// Function to show notifications
+function showNotification(message) {
+    const notificationElement = document.createElement('div');
+    notificationElement.className = 'notification';
+    notificationElement.textContent = message;
+
+    const notificationsContainer = document.getElementById('notifications');
+    notificationsContainer.appendChild(notificationElement);
+
+    // Remove the notification after 3 seconds
+    setTimeout(() => {
+        notificationsContainer.removeChild(notificationElement);
+    }, 3000);
+}
+
+// Helper function to shuffle an array
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
+// Function to apply a rule shift
+async function applyRuleShift() {
+    const ruleShift = generateRuleShift();
+    try {
+        const response = await fetch('/apply_rule_shift', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(ruleShift),
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to apply rule shift');
+        }
+
+        const data = await response.json();
+        logRecentAction(`Rule Shift Applied: ${ruleShift.name} - ${ruleShift.description}`);
+        updateGameState(data.gameState);
+
+        // Show a notification
+        showNotification(`Rule Shift: ${ruleShift.name} - ${ruleShift.description}`);
+    } catch (error) {
+        console.error('Error applying rule shift:', error);
+        alert(error.message);
+    }
+}
+
+// Trigger rule shifts every 3 turns
+let turnCount = 0;
+
+async function playCard() {
+    try {
+        showLoader();
+        if (!selectedCard) {
+            alert('Please select a card to play!');
+            return;
+        }
+
+        const response = await fetch('/play_card', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ player_name: 'Human Player', card: selectedCard }),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to play card');
+        }
+
+        const data = await response.json();
+        logRecentAction(`Played Card: ${selectedCard}`);
+        updatePlayedCard(selectedCard); // Update the played card section
+        await fetchGameState();
+        selectedCard = null;
+    } catch (error) {
+        console.error('Error playing card:', error);
+        alert(error.message);
+    } finally {
+        hideLoader();
+    }
+}
+
 let savedDecks = []; // Array to store saved decks
 
 function openDeckBuilder() {
+    console.log('Deck Builder button clicked'); // Debug log
+
     // Create a modal container
     const modal = document.createElement('div');
     modal.id = 'deck-builder-modal';
@@ -494,140 +820,11 @@ function openDeckBuilder() {
     }
 }
 
-// Function to display saved decks in the UI
-function displaySavedDecks() {
-    const savedDecksContainer = document.getElementById('saved-decks');
-    if (savedDecksContainer) {
-        savedDecksContainer.innerHTML = savedDecks.map((deck, index) => `
-            <div class="saved-deck" onclick="useDeck(${index})">
-                <strong>${deck.name}</strong>
-                <div class="deck-actions">
-                    <button onclick="useDeck(${index})">Use</button>
-                    <button onclick="deleteDeck(${index})">Delete</button>
-                </div>
-            </div>
-        `).join('');
-    }
-}
-
-// Function to use a saved deck
-async function useDeck(index) {
-    const selectedDeck = savedDecks[index];
-    alert(`Using deck: ${selectedDeck.name}`);
-
-    // Load the deck into the player's hand
-    loadDeckIntoGame(selectedDeck);
-
-    // Send the deck's cards to the backend
-    try {
-        const response = await fetch('/play_deck', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                player_name: 'Human Player',
-                deck: selectedDeck.cards,
-            }),
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Failed to play deck');
-        }
-
-        const data = await response.json();
-        console.log('Server response:', data); // Debug log
-    } catch (error) {
-        console.error('Error playing deck:', error);
-        alert(error.message); // Show an error message to the user
-    }
-}
-
-// Function to delete a saved deck
-function deleteDeck(index) {
-    if (confirm('Are you sure you want to delete this deck?')) {
-        savedDecks.splice(index, 1);
-        displaySavedDecks(); // Refresh the saved decks list
-    }
-}
-
-// Function to load a deck into the game
-function loadDeckIntoGame(deck) {
-    // Clear the current hand
-    const humanPlayerHand = document.getElementById('human-player-hand');
-    humanPlayerHand.innerHTML = '';
-
-    // Add cards from the deck to the player's hand
-    deck.cards.forEach(card => {
-        const cardElement = document.createElement('div');
-        cardElement.className = 'card-icon';
-        cardElement.textContent = card;
-        humanPlayerHand.appendChild(cardElement);
-    });
-
-    // Make the new cards clickable
-    makeCardsClickable();
-}
-
 // Fetch the initial game state on page load
 document.addEventListener('DOMContentLoaded', loadGame);
 
 function loadGame() {
     makeCardsClickable();
-};
+}
 
 setInterval(fetchGameState, 5000);
-let previousGameState = null;
-
-function areGameStatesEqual(gameState1, gameState2) {
-    // If either game state is null or undefined, consider them not equal
-    if (!gameState1 || !gameState2) {
-        return false;
-    }
-
-    // Compare the state property
-    if (gameState1.state !== gameState2.state) {
-        return false;
-    }
-
-    // Compare the recentActions array
-    if (gameState1.recentActions.length !== gameState2.recentActions.length) {
-        return false;
-    }
-    for (let i = 0; i < gameState1.recentActions.length; i++) {
-        if (gameState1.recentActions[i] !== gameState2.recentActions[i]) {
-            return false;
-        }
-    }
-
-    // Compare the leaderboard array
-    if (gameState1.leaderboard.length !== gameState2.leaderboard.length) {
-        return false;
-    }
-    for (let i = 0; i < gameState1.leaderboard.length; i++) {
-        if (gameState1.leaderboard[i].name !== gameState2.leaderboard[i].name ||
-            gameState1.leaderboard[i].wins !== gameState2.leaderboard[i].wins) {
-            return false;
-        }
-    }
-
-    // Compare the players array
-    if (gameState1.players.length !== gameState2.players.length) {
-        return false;
-    }
-    for (let i = 0; i < gameState1.players.length; i++) {
-        if (gameState1.players[i].name !== gameState2.players[i].name ||
-            gameState1.players[i].hand.length !== gameState2.players[i].hand.length) {
-            return false;
-        }
-        for (let j = 0; j < gameState1.players[i].hand.length; j++) {
-            if (gameState1.players[i].hand[j] !== gameState2.players[i].hand[j]) {
-                return false;
-            }
-        }
-    }
-
-    // If all checks pass, consider the game states equal
-    return true;
-}
