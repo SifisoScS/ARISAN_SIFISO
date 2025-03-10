@@ -380,9 +380,13 @@ function UpdateCurrentCardsArea(card) {
     const currentCardContainer = document.getElementById('current-cards');
     if (currentCardContainer) {
         currentCardContainer.innerHTML = card.map(cardText => {
-            const parts = cardText.split(' '); // Assuming card is in the format "Rank Suit"
-            const rank = parts[0]; // The rank is the first part
-            const suit = parts[parts.length - 1]; // The suit is the last part
+            const parts = cardText.trim().split(/\s+/); // Robust split on whitespace assuming card is in the format "Rank Suit"
+            if (parts.length < 2) {
+                console.error("Invalid card format:", cardText);
+                return ''; // Skip rendering card if format is invalid
+            }
+            const rank = parts[0]; // The first token is assumed to be the rank
+            const suit = parts[parts.length - 1]; // The last token is assumed to be the suit
             return `
             <div class="card-icon">
                 <span class="rank">${rank}</span>
