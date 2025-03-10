@@ -188,9 +188,13 @@ body {
     gap: 20px;
 }
 
+:root {
+    --color-dark-blue: #2d2b53;
+}
+
 /* Dashboard items now use the dark blue shade instead of deep-pink */
 .dashboard-item {
-    background-color: #2d2b53;
+    background-color: var(--color-dark-blue);
     border-radius: 12px;
     padding: 20px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
