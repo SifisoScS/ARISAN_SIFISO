@@ -1,4 +1,5 @@
 const audioCache = {};
+let savedDecks = [];
 
 // Function to play sound effects
 function playSoundEffect(sound) {
@@ -194,6 +195,80 @@ async function showLeaderboard() {
     }
 }
 
+// Function to show Leaderboard Panel
+async function showLeaderboardPanel() {
+    try {
+        showLoader();
+        const response = await fetch('/leaderboard');
+        const leaderboard = await response.json();
+
+        const resultsContainer = document.getElementById('game-results');
+        resultsContainer.innerHTML = '';
+
+        if (leaderboard.length > 0) {
+            const leaderboardList = document.createElement('ul');
+            leaderboardList.className = 'leaderboard-list'; // For styling
+
+            leaderboard.forEach((entry, index) => {
+                const listItem = document.createElement('li');
+                listItem.innerHTML = `
+                    <span class="rank">${index + 1}.</span>
+                    <span class="name">${entry.name}</span>
+                    <span class="wins">${entry.wins} wins</span>
+                `;
+                leaderboardList.appendChild(listItem);
+            });
+            resultsContainer.appendChild(leaderboardList);
+        } else {
+            resultsContainer.textContent = 'No leaderboard data available.';
+        }
+
+        resultsContainer.classList.add('show');
+    } catch (error) {
+        console.error('Error fetching leaderboard:', error);
+    } finally {
+        hideLoader();
+    }
+}
+
+// Function to fetch and display saved decks
+async function showSavedDecksPanel() {
+    try {
+        showLoader();
+
+        // Retrieve saved decks from localStorage
+        savedDecks = JSON.parse(localStorage.getItem('savedDecks')) || [];
+
+        const resultsContainer = document.getElementById('game-results');
+        resultsContainer.innerHTML = '';
+
+        if (savedDecks.length > 0) {
+            const deckList = document.createElement('ul');
+            deckList.className = 'saved-decks-list';
+
+            savedDecks.forEach((deck, index) => {
+                const listItem = document.createElement('li');
+                listItem.innerHTML = `
+                    <span class="deck-name">${deck.name}</span>
+                    <button onclick="useDeck(${index})">Use</button>
+                    <button onclick="deleteDeck(${index})">Delete</button>
+                `;
+                deckList.appendChild(listItem);
+            });
+
+            resultsContainer.appendChild(deckList);
+        } else {
+            resultsContainer.textContent = 'No saved decks available.';
+        }
+
+        resultsContainer.classList.add('show');
+    } catch (error) {
+        console.error('Error fetching saved decks:', error);
+    } finally {
+        hideLoader();
+    }
+}
+
 // Function to update recent actions
 function updateRecentActions(actions) {
     const recentActionsElement = document.getElementById('recent-actions');
@@ -300,17 +375,40 @@ function updateHumanPlayerHand(hand) {
     makeCardsClickable();
 }
 
+// Function to update Current Card Area
+function UpdateCurrentCardsArea(card) {
+    const currentCardContainer = document.getElementById('current-cards');
+    if (currentCardContainer) {
+        currentCardContainer.innerHTML = card.map(cardText => {
+            const parts = cardText.trim().split(/\s+/); // Robust split on whitespace assuming card is in the format "Rank Suit"
+            if (parts.length < 2) {
+                console.error("Invalid card format:", cardText);
+                return ''; // Skip rendering card if format is invalid
+            }
+            const rank = parts[0]; // The first token is assumed to be the rank
+            const suit = parts[parts.length - 1]; // The last token is assumed to be the suit
+            return `
+            <div class="card-icon">
+                <span class="rank">${rank}</span>
+                <span class="suit">${suit}</span>
+            </div>
+        `;
+        }).join('');
+    }
+}
+
 // Function to fetch and display the game state
 let playedCard = [];
 let previousGameState = null;
 
 async function fetchGameState() {
     try {
-        const response = await fetch('/game_state');
-        if (!response.ok) {
+        let currentCards = [];
+        const cardGameState = await fetch('/game_state');
+        if (!cardGameState.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
-        const gameState = await response.json();
+        const gameState = await cardGameState.json();
 
         // Compare the new game state with the previous game state
         if (!areGameStatesEqual(previousGameState, gameState)) {
@@ -328,6 +426,9 @@ async function fetchGameState() {
 
             // Update Human Player's Hand
             updateHumanPlayerHand(gameState.players.find(player => player.name === "Human Player")?.hand || []);
+
+            // Update Current Card area
+            UpdateCurrentCardsArea(gameState?.currentCards || []);
 
             // Update active rule shifts
             updateActiveRules(gameState.activeRuleShifts);
@@ -587,7 +688,8 @@ function useDeck(index) {
 function deleteDeck(index) {
     if (confirm('Are you sure you want to delete this deck?')) {
         savedDecks.splice(index, 1);
-        displaySavedDecks(); // Refresh the saved decks list
+        localStorage.setItem('savedDecks', JSON.stringify(savedDecks)); // Update localStorage
+        showSavedDecksPanel(); // Refresh the saved decks list
     }
 }
 
@@ -614,13 +716,12 @@ function displaySavedDecks() {
     const savedDecksContainer = document.getElementById('saved-decks');
     if (savedDecksContainer) {
         savedDecksContainer.innerHTML = savedDecks.map((deck, index) => `
-            <div class="saved-deck" onclick="useDeck(${index})">
-                <strong>${deck.name}</strong>
-                <div class="deck-actions">
-                    <button onclick="useDeck(${index})">Use</button>
-                    <button onclick="deleteDeck(${index})">Delete</button>
-                </div>
+            <div class="saved-deck">
+                <span class="deck-name">${deck.name}</span>
+                <button onclick="useDeck(${index})">Use</button>
+                <button onclick="deleteDeck(${index})">Delete</button>
             </div>
+
         `).join('');
     }
 }
@@ -714,10 +815,8 @@ async function playCard() {
     }
 }
 
-let savedDecks = []; // Array to store saved decks
-
 function openDeckBuilder() {
-    console.log('Deck Builder button clicked'); // Debug log
+    console.log('Deck Builder button clicked');
 
     // Create a modal container
     const modal = document.createElement('div');
@@ -800,15 +899,25 @@ function openDeckBuilder() {
         event.preventDefault();
         const deckName = deckNameInput.value.trim();
         if (deckName) {
-            // Save the deck with its name and cards
+            // Simulate the data to be contained for each deck
+            const deckData = [
+                'Card 1', 'Card 2', 'Card 3' // Sample deck
+            ]
             const deck = {
+                id: Date.now(),
                 name: deckName,
-                cards: ['Card 1', 'Card 2', 'Card 3'] // Example cards, replace with actual cards
+                cards: deckData
             };
             savedDecks.push(deck);
+
+            // Save to localStorage
+            localStorage.setItem('savedDecks', JSON.stringify(savedDecks));
             alert(`Deck "${deckName}" saved successfully!`);
+
+            // Display the saved deck after saving
+            showSavedDecksPanel();
+
             closeModal();
-            displaySavedDecks(); // Update the UI to show saved decks
         } else {
             alert('Please enter a deck name.');
         }
@@ -820,11 +929,43 @@ function openDeckBuilder() {
     }
 }
 
-// Fetch the initial game state on page load
+// To make sure it only loads once
+let loaded = false;
+// Function to display saved decks
+function displaySavedDecks() {
+    console.log("Call displaySavedDecks()");
+
+    const savedDecksContainer = document.getElementById('saved-decks');
+    if (savedDecksContainer) {
+        savedDecksContainer.innerHTML = savedDecks.map((deck) => `
+            <div class="saved-deck">
+                <span class="deck-name">${deck.name}</span>
+                <button onclick="useDeck(${deck.id})">Use</button>
+                <button onclick="deleteDeck(${deck.id})">Delete</button>
+            </div>
+
+        `).join('');
+    }
+}
+
+// Function to get saved decks from localStorage
+function getSavedDecks() {
+    let savedDecks = localStorage.getItem('savedDecks');
+
+    if (savedDecks) {
+        savedDecks = JSON.parse(savedDecks)
+        console.log("savedDecks", savedDecks); // Check if it's loading correctly
+    }
+    return savedDecks;
+}
+
+// Load saved decks on page load and run game
 document.addEventListener('DOMContentLoaded', loadGame);
 
 function loadGame() {
+    savedDecks = JSON.parse(localStorage.getItem('savedDecks')) || []; // Load saved decks from localStorage
     makeCardsClickable();
+    fetchGameState();
 }
 
 setInterval(fetchGameState, 5000);
