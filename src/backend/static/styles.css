@@ -247,10 +247,6 @@
       padding-top: 60px;
     }
   
-    .sidebar.active {
-      display: flex;
-    }
-  
     .sidebar-toggle {
       display: block;
     }
@@ -798,5 +794,3 @@
       opacity: 1;
       transition: opacity 0.3s ease;
   }
-
-  

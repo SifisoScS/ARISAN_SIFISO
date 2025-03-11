@@ -585,7 +585,7 @@ async function fetchGameState() {
         gameState.players.find((player) => player.name === "Human Player")
           ?.hand || []
       );
-
+      
       // Update Current Card area
       updateCurrentCardsArea(gameState?.currentCards || []);
 
