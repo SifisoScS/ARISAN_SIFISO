@@ -56,24 +56,44 @@ class GameManager:
             print(player)
 
     def determine_winner(self):
-        """Determines the winner and updates the leaderboard."""
-        highest_score = max(player.calculate_score() for player in self.players)
-        tied_players = [player for player in self.players if player.calculate_score() == highest_score]
+        """Determines the winner and updates the leaderboard. MODIFIED."""
+        # Helper function to calculate the highest score
+        def calculate_highest_score(players):
+            return max(player.calculate_score() for player in players)
+
+        # Helper function to filter players by score
+        def filter_players_by_score(players, score):
+            return [player for player in players if player.calculate_score() == score]
+
+        # Helper function to calculate the highest suit score
+        def calculate_highest_suit_score(players):
+            return max(player.calculate_suit_score() for player in players)
+
+        # Helper function to filter players by suit score
+        def filter_players_by_suit_score(players, suit_score):
+            return [player for player in players if player.calculate_suit_score() == suit_score]
+
+        # Calculate the highest score
+        highest_score = calculate_highest_score(self.players)
+        tied_players = filter_players_by_score(self.players, highest_score)
 
         if len(tied_players) == 1:
+            # Single winner
             winner = tied_players[0]
             print(f"\n🏆 Winner: {winner.name} with Score: {winner.calculate_score()}\n")
             self.update_leaderboard(winner.name)
         else:
-            # Handle Tie-Breaker by Suit Score
-            highest_suit_score = max(player.calculate_suit_score() for player in tied_players)
-            final_winners = [player for player in tied_players if player.calculate_suit_score() == highest_suit_score]
+            # Tie-Breaker by Suit Score
+            highest_suit_score = calculate_highest_suit_score(tied_players)
+            final_winners = filter_players_by_suit_score(tied_players, highest_suit_score)
 
             if len(final_winners) == 1:
+                # Winner after tie-break
                 winner = final_winners[0]
                 print(f"\n🏆 Winner after tie-break: {winner.name} with Suit Score: {winner.calculate_suit_score()}!\n")
                 self.update_leaderboard(winner.name)
             else:
+                # Multiple winners after tie-breaker
                 print("\n⚖️ The game is a tie between:")
                 for player in final_winners:
                     print(f"{player.name} - Score: {player.calculate_score()}, Suit Score: {player.calculate_suit_score()}")
