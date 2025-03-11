@@ -109,34 +109,55 @@
           <div id="game-results" class="dashboard-item results-container"></div>
 
           <div class="dashboard-item other-info">
-            <div class="player-hands">
-              <h2>Player Hands</h2>
-              <div id="player-hands"></div>
-            </div>
-
-            <div class="recent-actions">
-              <h2>Recent Actions</h2>
-              <div id="recent-actions"></div>
-            </div>
-
-            <!--Add here -->
+            <!-- Move Played Card next to your Hand -->
             <div class="played-card">
               <h2>Played Card</h2>
               <div id="played-card" class="card-row"></div>
             </div>
-            <div class="active-rules">
-              <h2>Active Rule Shifts</h2>
-              <div id="active-rules"></div>
+        
+            <div class="player-hands">
+              <h2>Player Hands</h2>
+              <div id="player-hands"></div>
             </div>
-
+           <!-- View Recents button -->
+           <button onclick="showRecentActions()">View Recent Actions</button>
+        
+            <!-- View Rules button -->
+            <button onclick="showActiveRules()">View Active Rules</button>
+        
+             <!-- Recent Actions Section (New) -->
+            <div id="recent-actions-container" class="hidden-section">
+                <h3>Recent Actions</h3>
+                <table id="recent-actions-table">
+                    <thead>
+                        <tr>
+                            <th>Player</th>
+                            <th>Action</th>
+                            <th>Card</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Actions will be dynamically inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        
+            <!--Active Rules Section (New) -->
+            <!-- Add View Rules Button-->
+            <div id="active-rules-container" class="hidden-section">
+                <h3>Active Rule Shifts</h3>
+                <div id="rule-shifts-container">
+                    <!-- Rule shifts will be dynamically inserted here -->
+                </div>
+            </div>
             <div id="notifications" class="notifications"></div>
-          </div>
+        </div>
         </section>
         <p id="success-message" class="hidden">Game reset successfully!</p>
         <div id="loader" class="loader"></div>
       </main>
     </div>
-
     <!-- Sidebar Navigation Toggle Button for small devices -->
     <button
       id="sidebar-toggle"
@@ -145,7 +166,6 @@
     >
       ☰
     </button>
-
     <script src="/static/script.js"></script>
   </body>
 </html>
