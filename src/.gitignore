@@ -64,3 +64,23 @@ Desktop.ini
 *.swp
 *.swo
 *~
+
+# AI/ML model files
+*.pt
+*.h5
+*.pkl
+*.joblib
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Logs and output files
+*.log
+*.out
+
+# Test outputs
+test_output/
+
+# Local database files
+*.db
+*.sqlite
