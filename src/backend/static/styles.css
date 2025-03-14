@@ -770,4 +770,81 @@ th.active-sort {
                 inset -2px -2px 6px rgba(0, 0, 0, 0.2);
     word-break: break-word;
 }
-
+/* AI Game Board Styling */
+.ai-game-board {
+    background: #222;
+    color: white;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+    margin-top: 20px;
+  }
+  
+  .ai-status {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  
+  .ai-card-zone {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    min-height: 50px;
+    border: 2px dashed #888;
+    padding: 10px;
+    margin-bottom: 15px;
+  }
+  
+  .ai-action-button {
+    background: #444;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    margin: 5px;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+  
+  .ai-decision-log {
+    background: #333;
+    padding: 10px;
+    border-radius: 8px;
+    text-align: left;
+  }
+  
+  .ai-decision-log ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .ai-decision-log li {
+    padding: 5px;
+    font-size: 14px;
+    border-bottom: 1px solid #555;
+  }
+  
+  /* AI Strategy Selection */
+  .ai-strategy-selector {
+    margin-top: 15px;
+    padding: 10px;
+    background: #333;
+    border-radius: 8px;
+    text-align: center;
+  }
+  
+  .strategy-button {
+    background: #555;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    margin: 5px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-weight: bold;
+  }
+  
+  .strategy-button:hover {
+    background: #777;
+  }
+  
