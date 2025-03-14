@@ -120,6 +120,10 @@ function updatePlayedCard(card) {
 const audioCache = {};
 let savedDecks = [];
 
+function goHome() {
+    location.reload(); // Refreshes the page to reset the game state
+}
+
 // Function to play sound effects
 function playSoundEffect(sound) {
   let audio = audioCache[sound];
@@ -496,6 +500,57 @@ async function showLeaderboardPanel() {
   } finally {
     hideLoader();
   }
+}
+
+let aiStrategy = "strategic"; // Default AI strategy
+
+function setAIStrategy(strategy) {
+    aiStrategy = strategy;
+    document.getElementById("ai-status").textContent = `AI is now playing in ${strategy} mode.`;
+}
+
+function aiMakeMove() {
+    const aiStatus = document.getElementById("ai-status");
+    const aiCardZone = document.getElementById("ai-card-zone");
+    const aiLog = document.getElementById("ai-log");
+
+    aiStatus.textContent = "AI is thinking...";
+
+    setTimeout(() => {
+        let aiMove = chooseAIMove();
+        const cardElement = document.createElement("div");
+        cardElement.classList.add("card");
+        cardElement.innerHTML = aiMove;
+        aiCardZone.appendChild(cardElement);
+
+        aiStatus.textContent = `AI played ${aiMove}`;
+
+        // Logging AI Move
+        const logEntry = document.createElement("li");
+        logEntry.textContent = `AI (${aiStrategy}) played ${aiMove}`;
+        aiLog.prepend(logEntry);
+
+    }, 1500);
+}
+
+function chooseAIMove() {
+    const ranks = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
+    const suits = ["♠", "♥", "♦", "♣"];
+    let chosenCard = "";
+
+    if (aiStrategy === "strategic") {
+        // Prefers high-value cards or those that align with a pattern
+        chosenCard = ranks[Math.floor(Math.random() * 5 + 8)] + "<span class='suit'>" + suits[Math.floor(Math.random() * suits.length)] + "</span>";
+    } else if (aiStrategy === "aggressive") {
+        // Prefers face cards (J, Q, K, A)
+        const highRanks = ["A", "K", "Q", "J"];
+        chosenCard = highRanks[Math.floor(Math.random() * highRanks.length)] + "<span class='suit'>" + suits[Math.floor(Math.random() * suits.length)] + "</span>";
+    } else if (aiStrategy === "defensive") {
+        // Prefers lower-value cards (2-6) to keep strong ones for later
+        chosenCard = ranks[Math.floor(Math.random() * 5 + 1)] + "<span class='suit'>" + suits[Math.floor(Math.random() * suits.length)] + "</span>";
+    }
+
+    return chosenCard;
 }
 
 // Function to show Saved Decks Panel
