@@ -5,9 +5,9 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from game.game_manager import GameManager  
 
-app = Flask(__name__, template_folder="templates", static_folder="static")
+app = Flask(__name__)
 
-# Initialize the game manager
+# Update to include the human player
 game_manager = GameManager(include_human=True)
 
 @app.route("/")
@@ -72,19 +72,6 @@ def play_card():
     print(f"Player {player_name} played card: {card}")
 
     return jsonify({'message': f'Card {card} played successfully'}), 200
-
-@app.route('/apply_rule_shift', methods=['POST'])
-def apply_rule_shift():
-    rule_shift = request.json
-    try:
-        # Apply the rule shift to the game state
-        game_manager.apply_rule_shift(rule_shift)
-        return jsonify({
-            "message": f"Rule Shift Applied: {rule_shift['name']}",
-            "gameState": game_manager.game_state
-        })
-    except Exception as e:
-        return jsonify({"error": str(e)}), 400
 
 if __name__ == '__main__':
     app.run(debug=True)
