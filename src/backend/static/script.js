@@ -121,7 +121,7 @@ const audioCache = {};
 let savedDecks = [];
 
 function goHome() {
-    location.reload(); // Refreshes the page to reset the game state
+  location.reload(); // Refreshes the page to reset the game state
 }
 
 // Function to play sound effects
@@ -145,101 +145,105 @@ function toggleSidebar() {
 
 // script.js
 async function toggleSections() {
-    const sections = document.getElementById("optional-sections");
-    sections.classList.toggle("hidden-section");
-    sections.classList.toggle("visible-section");
+  const sections = document.getElementById("optional-sections");
+  sections.classList.toggle("hidden-section");
+  sections.classList.toggle("visible-section");
 }
 
 // Function to show Recent Actions
 document.addEventListener("DOMContentLoaded", function () {
-    const recentActionsTable = document.querySelector("#recent-actions-table tbody");
+  const recentActionsTable = document.querySelector(
+    "#recent-actions-table tbody"
+  );
 
-    // Function to add a new action row
-    function addRecentAction(player, action, card) {
-        const newRow = document.createElement("tr");
-        const time = new Date().toLocaleTimeString(); // Get current time
+  // Function to add a new action row
+  function addRecentAction(player, action, card) {
+    const newRow = document.createElement("tr");
+    const time = new Date().toLocaleTimeString(); // Get current time
 
-        newRow.innerHTML = `
+    newRow.innerHTML = `
             <td>${player}</td>
             <td>${action}</td>
             <td>${card || "—"}</td>
             <td>${time}</td>
         `;
 
-        recentActionsTable.prepend(newRow); // Add new action at the top
+    recentActionsTable.prepend(newRow); // Add new action at the top
 
-        // Limit recent actions to the last 5 entries
-        if (recentActionsTable.rows.length > 5) {
-            recentActionsTable.deleteRow(5);
-        }
+    // Limit recent actions to the last 5 entries
+    if (recentActionsTable.rows.length > 5) {
+      recentActionsTable.deleteRow(5);
     }
-      // Function to show Recent Actions
-    window.showRecentActions = async function () {
-      const recentActionsContainer = document.getElementById("recent-actions-container");
-      recentActionsContainer.classList.remove("hidden-section");
+  }
+  // Function to show Recent Actions
+  window.showRecentActions = async function () {
+    const recentActionsContainer = document.getElementById(
+      "recent-actions-container"
+    );
+    recentActionsContainer.classList.remove("hidden-section");
+  };
+  // Example: Adding a test action (Replace with real game events)
+  setTimeout(() => {
+    addRecentAction("Player 1", "Played", "A♠");
+    addRecentAction("Player 2", "Drew", "K♥");
+  }, 1000);
 
-    };
-    // Example: Adding a test action (Replace with real game events)
-    setTimeout(() => {
-        addRecentAction("Player 1", "Played", "A♠");
-        addRecentAction("Player 2", "Drew", "K♥");
-    }, 1000);
-
-    // Expose function globally for use in the game logic
-    window.addRecentAction = addRecentAction;
+  // Expose function globally for use in the game logic
+  window.addRecentAction = addRecentAction;
 });
 
-  // Function to update active rules
+// Function to update active rules
 async function showActiveRules() {
-    try {
-        const activeRulesContainer = document.getElementById("active-rules-container");
-        activeRulesContainer.classList.remove("hidden-section");
+  try {
+    const activeRulesContainer = document.getElementById(
+      "active-rules-container"
+    );
+    activeRulesContainer.classList.remove("hidden-section");
 
-        const response = await fetch('/game_state');
-        const data = await response.json();
-        const activeRules = data.activeRuleShifts;
-
-        const ruleShiftsContainer = document.getElementById("rule-shifts-container");
-        //First clear the exisiting container before adding new data.
-        ruleShiftsContainer.innerHTML = '';
-
-        if (activeRules && activeRules.length > 0) {
-            activeRules.forEach(rule => {
-                addRuleShift(rule.name, rule.description);
-            });
-        } else {
-            activeRulesContainer.textContent = 'No active rules.';
-        }
-    } catch (error) {
-        console.error('Error fetching active rules:', error);
-        activeRulesContainer.textContent = 'Error fetching active rules.';
-    }
-}
-document.addEventListener("DOMContentLoaded", function () {
+    const response = await fetch("/game_state");
+    const data = await response.json();
+    const activeRules = data.activeRuleShifts;
 
     const ruleShiftsContainer = document.getElementById("rule-shifts-container");
+    //First clear the exisiting container before adding new data.
+    ruleShiftsContainer.innerHTML = "";
 
-    // Function to add a new rule shift
-    function addRuleShift(ruleName, ruleDescription) {
-        const newRule = document.createElement("div");
-        newRule.classList.add("rule-shift");
+    if (activeRules && activeRules.length > 0) {
+      activeRules.forEach((rule) => {
+        addRuleShift(rule.name, rule.description);
+      });
+    } else {
+      activeRulesContainer.textContent = "No active rules.";
+    }
+  } catch (error) {
+    console.error("Error fetching active rules:", error);
+    activeRulesContainer.textContent = "Error fetching active rules.";
+  }
+}
+document.addEventListener("DOMContentLoaded", function () {
+  const ruleShiftsContainer = document.getElementById("rule-shifts-container");
 
-        const time = new Date().toLocaleTimeString(); // Get current time
-        newRule.innerHTML = `
+  // Function to add a new rule shift
+  function addRuleShift(ruleName, ruleDescription) {
+    const newRule = document.createElement("div");
+    newRule.classList.add("rule-shift");
+
+    const time = new Date().toLocaleTimeString(); // Get current time
+    newRule.innerHTML = `
             <p><strong>${ruleName}:</strong> ${ruleDescription}</p>
             <span class="rule-time">${time}</span>
         `;
 
-        //Append child instead of prepending for accurate display
-        ruleShiftsContainer.appendChild(newRule);
+    //Append child instead of prepending for accurate display
+    ruleShiftsContainer.appendChild(newRule);
 
-        // Limit rule shifts to the last 3 entries
-        if (ruleShiftsContainer.children.length > 3) {
-            ruleShiftsContainer.removeChild(ruleShiftsContainer.firstChild);
-        }
+    // Limit rule shifts to the last 3 entries
+    if (ruleShiftsContainer.children.length > 3) {
+      ruleShiftsContainer.removeChild(ruleShiftsContainer.firstChild);
     }
-    // Expose function globally for use in the game logic
-    window.addRuleShift = addRuleShift;
+  }
+  // Expose function globally for use in the game logic
+  window.addRuleShift = addRuleShift;
 });
 
 // Function to update the game state
@@ -502,57 +506,6 @@ async function showLeaderboardPanel() {
   }
 }
 
-let aiStrategy = "strategic"; // Default AI strategy
-
-function setAIStrategy(strategy) {
-    aiStrategy = strategy;
-    document.getElementById("ai-status").textContent = `AI is now playing in ${strategy} mode.`;
-}
-
-function aiMakeMove() {
-    const aiStatus = document.getElementById("ai-status");
-    const aiCardZone = document.getElementById("ai-card-zone");
-    const aiLog = document.getElementById("ai-log");
-
-    aiStatus.textContent = "AI is thinking...";
-
-    setTimeout(() => {
-        let aiMove = chooseAIMove();
-        const cardElement = document.createElement("div");
-        cardElement.classList.add("card");
-        cardElement.innerHTML = aiMove;
-        aiCardZone.appendChild(cardElement);
-
-        aiStatus.textContent = `AI played ${aiMove}`;
-
-        // Logging AI Move
-        const logEntry = document.createElement("li");
-        logEntry.textContent = `AI (${aiStrategy}) played ${aiMove}`;
-        aiLog.prepend(logEntry);
-
-    }, 1500);
-}
-
-function chooseAIMove() {
-    const ranks = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
-    const suits = ["♠", "♥", "♦", "♣"];
-    let chosenCard = "";
-
-    if (aiStrategy === "strategic") {
-        // Prefers high-value cards or those that align with a pattern
-        chosenCard = ranks[Math.floor(Math.random() * 5 + 8)] + "<span class='suit'>" + suits[Math.floor(Math.random() * suits.length)] + "</span>";
-    } else if (aiStrategy === "aggressive") {
-        // Prefers face cards (J, Q, K, A)
-        const highRanks = ["A", "K", "Q", "J"];
-        chosenCard = highRanks[Math.floor(Math.random() * highRanks.length)] + "<span class='suit'>" + suits[Math.floor(Math.random() * suits.length)] + "</span>";
-    } else if (aiStrategy === "defensive") {
-        // Prefers lower-value cards (2-6) to keep strong ones for later
-        chosenCard = ranks[Math.floor(Math.random() * 5 + 1)] + "<span class='suit'>" + suits[Math.floor(Math.random() * suits.length)] + "</span>";
-    }
-
-    return chosenCard;
-}
-
 // Function to show Saved Decks Panel
 async function showSavedDecksPanel() {
   try {
@@ -640,7 +593,7 @@ async function fetchGameState() {
         gameState.players.find((player) => player.name === "Human Player")
           ?.hand || []
       );
-      
+
       // Update Current Card area
       updateCurrentCardsArea(gameState?.currentCards || []);
 
@@ -975,217 +928,217 @@ function deleteDeck(deckId) {
       localStorage.setItem("savedDecks", JSON.stringify(savedDecks));
       showSavedDecksPanel(); // Refresh the saved decks list
     } else {
-        (`Deck with id ${deckId} not found for deletion.`);
-        showNotification(`Deck with id ${deckId} not found for deletion.`); // Use notification system
-      }
+      (`Deck with id ${deckId} not found for deletion.`);
+      showNotification(`Deck with id ${deckId} not found for deletion.`); // Use notification system
     }
   }
-  
-  // Function to load a deck into the game
-  function loadDeckIntoGame(deck) {
-    // Clear the current hand
-    const humanPlayerHand = document.getElementById("human-player-hand");
-    humanPlayerHand.innerHTML = "";
-  
-    // Add cards from the deck to the player's hand
-    deck.cards.forEach((card) => {
-      const cardElement = document.createElement("div");
-      cardElement.className = "card-icon";
-      cardElement.textContent = card;
-      humanPlayerHand.appendChild(cardElement);
+}
+
+// Function to load a deck into the game
+function loadDeckIntoGame(deck) {
+  // Clear the current hand
+  const humanPlayerHand = document.getElementById("human-player-hand");
+  humanPlayerHand.innerHTML = "";
+
+  // Add cards from the deck to the player's hand
+  deck.cards.forEach((card) => {
+    const cardElement = document.createElement("div");
+    cardElement.className = "card-icon";
+    cardElement.textContent = card;
+    humanPlayerHand.appendChild(cardElement);
+  });
+
+  // Make the new cards clickable
+  makeCardsClickable();
+}
+
+// Function to show notifications
+function showNotification(message) {
+  const notificationElement = document.createElement("div");
+  notificationElement.className = "notification";
+  notificationElement.textContent = message;
+
+  const notificationsContainer = document.getElementById("notifications");
+  notificationsContainer.appendChild(notificationElement);
+
+  // Remove the notification after 3 seconds
+  setTimeout(() => {
+    notificationsContainer.removeChild(notificationElement);
+  }, 3000);
+}
+
+// Helper function to shuffle an array
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+// Function to apply a rule shift
+async function applyRuleShift() {
+  const ruleShift = generateRuleShift();
+  try {
+    const response = await fetch("/apply_rule_shift", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(ruleShift),
     });
-  
-    // Make the new cards clickable
-    makeCardsClickable();
-  }
-  
-  // Function to show notifications
-  function showNotification(message) {
-    const notificationElement = document.createElement("div");
-    notificationElement.className = "notification";
-    notificationElement.textContent = message;
-  
-    const notificationsContainer = document.getElementById("notifications");
-    notificationsContainer.appendChild(notificationElement);
-  
-    // Remove the notification after 3 seconds
-    setTimeout(() => {
-      notificationsContainer.removeChild(notificationElement);
-    }, 3000);
-  }
-  
-  // Helper function to shuffle an array
-  function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
+
+    if (!response.ok) {
+      throw new Error("Failed to apply rule shift");
     }
-    return array;
+
+    const data = await response.json();
+    logRecentAction(
+      `Rule Shift Applied: ${ruleShift.name} - ${ruleShift.description}`
+    );
+    updateGameState(data.gameState);
+
+    // Show a notification
+    showNotification(`Rule Shift: ${ruleShift.name} - ${ruleShift.description}`);
+  } catch (error) {
+    console.error("Error applying rule shift:", error);
+    alert(error.message);
   }
-  
-  // Function to apply a rule shift
-  async function applyRuleShift() {
-    const ruleShift = generateRuleShift();
-    try {
-      const response = await fetch("/apply_rule_shift", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(ruleShift),
-      });
-  
-      if (!response.ok) {
-        throw new Error("Failed to apply rule shift");
-      }
-  
-      const data = await response.json();
-      logRecentAction(
-        `Rule Shift Applied: ${ruleShift.name} - ${ruleShift.description}`
-      );
-      updateGameState(data.gameState);
-  
-      // Show a notification
-      showNotification(`Rule Shift: ${ruleShift.name} - ${ruleShift.description}`);
-    } catch (error) {
-      console.error("Error applying rule shift:", error);
-      alert(error.message);
-    }
+}
+
+// Trigger rule shifts every 3 turns
+let turnCount = 0;
+
+function openDeckBuilder() {
+  console.log("Deck Builder button clicked");
+
+  // Create a modal container
+  const modal = document.createElement("div");
+  modal.id = "deck-builder-modal";
+  modal.style.position = "fixed";
+  modal.style.top = "0";
+  modal.style.left = "0";
+  modal.style.width = "100%";
+  modal.style.height = "100%";
+  modal.style.backgroundColor = "rgba(0, 0, 0, 0.7)";
+  modal.style.display = "flex";
+  modal.style.justifyContent = "center";
+modal.style.alignItems = "center";
+modal.style.zIndex = "1000";
+
+// Create modal content
+const modalContent = document.createElement("div");
+modalContent.style.backgroundColor = "#fff";
+modalContent.style.padding = "20px";
+modalContent.style.borderRadius = "10px";
+modalContent.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.2)";
+modalContent.style.maxWidth = "500px";
+modalContent.style.width = "100%";
+
+// Add a title to the modal
+const title = document.createElement("h2");
+title.textContent = "Deck Builder";
+title.style.marginBottom = "20px";
+modalContent.appendChild(title);
+
+// Add a form for deck-building
+const form = document.createElement("form");
+form.id = "deck-builder-form";
+
+// Input for deck name
+const deckNameLabel = document.createElement("label");
+deckNameLabel.textContent = "Deck Name:";
+deckNameLabel.style.display = "block";
+deckNameLabel.style.marginBottom = "10px";
+const deckNameInput = document.createElement("input");
+deckNameInput.type = "text";
+deckNameInput.name = "deckName";
+deckNameInput.required = true;
+deckNameInput.style.width = "100%";
+deckNameInput.style.padding = "8px";
+deckNameInput.style.marginBottom = "20px";
+form.appendChild(deckNameLabel);
+form.appendChild(deckNameInput);
+
+// Button to submit the form
+const submitButton = document.createElement("button");
+submitButton.type = "submit";
+submitButton.textContent = "Save Deck";
+submitButton.style.padding = "10px 20px";
+submitButton.style.backgroundColor = "#007BFF";
+submitButton.style.color = "#fff";
+submitButton.style.border = "none";
+submitButton.style.borderRadius = "5px";
+submitButton.style.cursor = "pointer";
+form.appendChild(submitButton);
+
+// Add form to modal content
+modalContent.appendChild(form);
+
+// Add modal content to modal
+modal.appendChild(modalContent);
+
+// Add modal to the body
+document.body.appendChild(modal);
+
+// Close modal when clicking outside the modal content
+modal.addEventListener("click", (event) => {
+  if (event.target === modal) {
+    closeModal();
   }
-  
-  // Trigger rule shifts every 3 turns
-  let turnCount = 0;
-  
-  function openDeckBuilder() {
-    console.log("Deck Builder button clicked");
-  
-    // Create a modal container
-    const modal = document.createElement("div");
-    modal.id = "deck-builder-modal";
-    modal.style.position = "fixed";
-    modal.style.top = "0";
-    modal.style.left = "0";
-    modal.style.width = "100%";
-    modal.style.height = "100%";
-    modal.style.backgroundColor = "rgba(0, 0, 0, 0.7)";
-    modal.style.display = "flex";
-    modal.style.justifyContent = "center";
-    modal.style.alignItems = "center";
-    modal.style.zIndex = "1000";
-  
-    // Create modal content
-    const modalContent = document.createElement("div");
-    modalContent.style.backgroundColor = "#fff";
-    modalContent.style.padding = "20px";
-    modalContent.style.borderRadius = "10px";
-    modalContent.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.2)";
-    modalContent.style.maxWidth = "500px";
-    modalContent.style.width = "100%";
-  
-    // Add a title to the modal
-    const title = document.createElement("h2");
-    title.textContent = "Deck Builder";
-    title.style.marginBottom = "20px";
-    modalContent.appendChild(title);
-  
-    // Add a form for deck-building
-    const form = document.createElement("form");
-    form.id = "deck-builder-form";
-  
-    // Input for deck name
-    const deckNameLabel = document.createElement("label");
-    deckNameLabel.textContent = "Deck Name:";
-    deckNameLabel.style.display = "block";
-    deckNameLabel.style.marginBottom = "10px";
-    const deckNameInput = document.createElement("input");
-    deckNameInput.type = "text";
-    deckNameInput.name = "deckName";
-    deckNameInput.required = true;
-    deckNameInput.style.width = "100%";
-    deckNameInput.style.padding = "8px";
-    deckNameInput.style.marginBottom = "20px";
-    form.appendChild(deckNameLabel);
-    form.appendChild(deckNameInput);
-  
-    // Button to submit the form
-    const submitButton = document.createElement("button");
-    submitButton.type = "submit";
-    submitButton.textContent = "Save Deck";
-    submitButton.style.padding = "10px 20px";
-    submitButton.style.backgroundColor = "#007BFF";
-    submitButton.style.color = "#fff";
-    submitButton.style.border = "none";
-    submitButton.style.borderRadius = "5px";
-    submitButton.style.cursor = "pointer";
-    form.appendChild(submitButton);
-  
-    // Add form to modal content
-    modalContent.appendChild(form);
-  
-    // Add modal content to modal
-    modal.appendChild(modalContent);
-  
-    // Add modal to the body
-    document.body.appendChild(modal);
-  
-    // Close modal when clicking outside the modal content
-    modal.addEventListener("click", (event) => {
-      if (event.target === modal) {
-        closeModal();
-      }
-    });
-  
-    // Handle form submission
-    form.addEventListener("submit", (event) => {
-      event.preventDefault();
-      const deckName = deckNameInput.value.trim();
-      if (deckName) {
-        // Simulate the data to be contained for each deck
-        const deckData = ["Card 1", "Card 2", "Card 3"]; // Sample deck
-        const deck = {
-          id: Date.now(),
-          name: deckName,
-          cards: deckData,
-        };
-        savedDecks.push(deck);
-  
-        // Save to localStorage
-        localStorage.setItem("savedDecks", JSON.stringify(savedDecks));
-        alert(`Deck "${deckName}" saved successfully!`);
-  
-        // Display the saved deck after saving
-        showSavedDecksPanel();
-  
-        closeModal();
-      } else {
-        alert("Please enter a deck name.");
-      }
-    });
-  
-    // Function to close the modal
-    function closeModal() {
-      document.body.removeChild(modal);
-    }
+});
+
+// Handle form submission
+form.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const deckName = deckNameInput.value.trim();
+  if (deckName) {
+    // Simulate the data to be contained for each deck
+    const deckData = ["Card 1", "Card 2", "Card 3"]; // Sample deck
+    const deck = {
+      id: Date.now(),
+      name: deckName,
+      cards: deckData,
+    };
+    savedDecks.push(deck);
+
+    // Save to localStorage
+    localStorage.setItem("savedDecks", JSON.stringify(savedDecks));
+    alert(`Deck "${deckName}" saved successfully!`);
+
+    // Display the saved deck after saving
+    showSavedDecksPanel();
+
+    closeModal();
+  } else {
+    alert("Please enter a deck name.");
   }
-  
-  // Function to get saved decks from localStorage
-  function getSavedDecks() {
-    let savedDecks = localStorage.getItem("savedDecks");
-  
-    if (savedDecks) {
-      savedDecks = JSON.parse(savedDecks);
-      console.log("savedDecks", savedDecks); // Check if it's loading correctly
-    }
-    return savedDecks;
-  }
-  
-  // Load saved decks on page load and run game
-  document.addEventListener("DOMContentLoaded", loadGame);
-  
-  function loadGame() {
-    savedDecks = JSON.parse(localStorage.getItem("savedDecks")) || []; // Load saved decks from localStorage
-    makeCardsClickable();
-    fetchGameState();
-  }
-  
-  setInterval(fetchGameState, 5000);
+});
+
+// Function to close the modal
+function closeModal() {
+  document.body.removeChild(modal);
+}
+}
+
+// Function to get saved decks from localStorage
+function getSavedDecks() {
+let savedDecks = localStorage.getItem("savedDecks");
+
+if (savedDecks) {
+  savedDecks = JSON.parse(savedDecks);
+  console.log("savedDecks", savedDecks); // Check if it's loading correctly
+}
+return savedDecks;
+}
+
+// Load saved decks on page load and run game
+document.addEventListener("DOMContentLoaded", loadGame);
+
+function loadGame() {
+savedDecks = JSON.parse(localStorage.getItem("savedDecks")) || []; // Load saved decks from localStorage
+makeCardsClickable();
+fetchGameState();
+}
+
+setInterval(fetchGameState, 5000);

@@ -97,55 +97,6 @@
           <p id="game-state" class="game-state">Waiting to Start</p>
         </section>
 
-        <!-- AI Game Board Section -->
-        <section class="ai-game-board">
-          <h2>AI Game Board</h2>
-
-          <div class="ai-status">
-            <p id="ai-status">AI is waiting for the player's move...</p>
-          </div>
-
-          <div class="ai-card-zone" id="ai-card-zone">
-            <!-- AI Played Cards will appear here dynamically -->
-          </div>
-
-          <div class="ai-strategy-selector">
-            <h3>AI Strategy</h3>
-            <button
-              class="strategy-button"
-              onclick="setAIStrategy('strategic')"
-            >
-              Strategic
-            </button>
-            <button
-              class="strategy-button"
-              onclick="setAIStrategy('aggressive')"
-            >
-              Aggressive
-            </button>
-            <button
-              class="strategy-button"
-              onclick="setAIStrategy('defensive')"
-            >
-              Defensive
-            </button>
-          </div>
-
-          <div class="ai-actions">
-            <button class="ai-action-button" onclick="aiMakeMove()">
-              AI Move
-            </button>
-          </div>
-
-          <div class="ai-decision-log">
-            <h3>AI Decision Log</h3>
-            <ul id="ai-log">
-              <!-- AI decisions will be added dynamically here -->
-            </ul>
-          </div>
-
-        </section>
-
         <p id="success-message" class="hidden">Game reset successfully!</p>
         <div id="loader" class="loader"></div>
       </main>
