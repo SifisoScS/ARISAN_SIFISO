@@ -498,7 +498,7 @@ function openDeckBuilder() {
     // Utility function to create a modal
 function createModal({ titleText, contentElement, onClose }) {
     const modal = document.createElement('div');
-    modal.id = 'modal';
+    modal.id = 'modal-' + Math.random().toString(36).substr(2, 9);
     Object.assign(modal.style, {
       position: 'fixed',
       top: '0',
