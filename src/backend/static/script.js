@@ -39,9 +39,9 @@ function updateHumanPlayerHand(hand) {
     // Attach click listeners to new cards
     const newCards = document.querySelectorAll('#human-player-hand .card-icon');
     newCards.forEach(card => {
-      attachCardClickListener(card, (selectedCard) => {
-        selectedCard = selectedCard.textContent; // Store the selected card
-        console.log('Selected Card:', selectedCard);
+      attachCardClickListener(card, (cardElement) => {
+        const cardText = cardElement.textContent; // Store the selected card
+        console.log('Selected Card:', cardText);
       });
     });
   }
