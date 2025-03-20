@@ -19,6 +19,33 @@ function toggleSidebar() {
     sidebar.classList.toggle('active');
 }
 
+// Update updateHumanPlayerHand to use the helper
+function updateHumanPlayerHand(hand) {
+    const humanPlayerHandElement = document.getElementById('human-player-hand');
+    humanPlayerHandElement.innerHTML = hand
+      .map((cardText) => {
+        const parts = cardText.split(' ');
+        const rank = parts[0];
+        const suit = parts[parts.length - 1];
+        return `
+          <div class="card-icon">
+              <span class="rank">${rank}</span>
+              <span class="suit">${suit}</span>
+          </div>
+        `;
+      })
+      .join('');
+  
+    // Attach click listeners to new cards
+    const newCards = document.querySelectorAll('#human-player-hand .card-icon');
+    newCards.forEach(card => {
+      attachCardClickListener(card, (selectedCard) => {
+        selectedCard = selectedCard.textContent; // Store the selected card
+        console.log('Selected Card:', selectedCard);
+      });
+    });
+  }
+
 // Function to update the game state
 function updateGameState(state) {
     const gameStateElement = document.getElementById('game-state');
@@ -234,19 +261,29 @@ async function fetchGameState() {
     }
 }
 
+// Helper function to attach card click listeners
+function attachCardClickListener(card, onClick) {
+  card.addEventListener('click', () => {
+    // Remove 'selected' class from all cards
+    document.querySelectorAll('#human-player-hand .card-icon').forEach(c => c.classList.remove('selected'));
+    // Add 'selected' class to the clicked card
+    card.classList.add('selected');
+    // Call the provided onClick handler
+    onClick(card);
+  });
+}
+
+// Update makeCardsClickable to use the helper
 // Function to make cards clickable
 function makeCardsClickable() {
     const cards = document.querySelectorAll('#human-player-hand .card-icon');
     cards.forEach(card => {
-        card.addEventListener('click', () => {
-            // Remove the 'selected' class from all cards
-            cards.forEach(c => c.classList.remove('selected'));
-
-            // Add the 'selected' class to the clicked card
-            card.classList.add('selected');
-        });
+      attachCardClickListener(card, (selectedCard) => {
+        selectedCard = selectedCard.textContent; // Store the selected card
+        console.log('Selected Card:', selectedCard);
+      });
     });
-}
+  }
 
 // Function to draw a card
 async function drawCard() {
@@ -458,11 +495,117 @@ function openDeckBuilder() {
         }
     });
 
-    // Function to close the modal
-    function closeModal() {
+    // Utility function to create a modal
+function createModal({ titleText, contentElement, onClose }) {
+    const modal = document.createElement('div');
+    modal.id = 'modal';
+    Object.assign(modal.style, {
+      position: 'fixed',
+      top: '0',
+      left: '0',
+      width: '100%',
+      height: '100%',
+      backgroundColor: 'rgba(0, 0, 0, 0.7)',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      zIndex: '1000',
+    });
+  
+    const modalContent = document.createElement('div');
+    Object.assign(modalContent.style, {
+      backgroundColor: '#fff',
+      padding: '20px',
+      borderRadius: '10px',
+      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+      maxWidth: '500px',
+      width: '100%',
+    });
+  
+    const title = document.createElement('h2');
+    title.textContent = titleText;
+    title.style.marginBottom = '20px';
+    modalContent.appendChild(title);
+    modalContent.appendChild(contentElement);
+    modal.appendChild(modalContent);
+  
+    // Close modal when clicking outside the modal content
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        onClose && onClose();
         document.body.removeChild(modal);
+      }
+    });
+  
+    document.body.appendChild(modal);
+    return modal;
+  }
+  
+  // Update openDeckBuilder to use the modal utility
+function openDeckBuilder() {
+    const form = document.createElement('form');
+    form.id = 'deck-builder-form';
+  
+    // Input for deck name
+    const deckNameLabel = document.createElement('label');
+    deckNameLabel.textContent = 'Deck Name:';
+    deckNameLabel.style.display = 'block';
+    deckNameLabel.style.marginBottom = '10px';
+    const deckNameInput = document.createElement('input');
+    deckNameInput.type = 'text';
+    deckNameInput.name = 'deckName';
+    deckNameInput.required = true;
+    deckNameInput.style.width = '100%';
+    deckNameInput.style.padding = '8px';
+    deckNameInput.style.marginBottom = '20px';
+    form.appendChild(deckNameLabel);
+    form.appendChild(deckNameInput);
+  
+    // Button to submit the form
+    const submitButton = document.createElement('button');
+    submitButton.type = 'submit';
+    submitButton.textContent = 'Save Deck';
+    submitButton.style.padding = '10px 20px';
+    submitButton.style.backgroundColor = '#007BFF';
+    submitButton.style.color = '#fff';
+    submitButton.style.border = 'none';
+    submitButton.style.borderRadius = '5px';
+    submitButton.style.cursor = 'pointer';
+    form.appendChild(submitButton);
+  
+    // Handle form submission
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const deckName = deckNameInput.value.trim();
+      if (deckName) {
+        const deck = {
+          name: deckName,
+          cards: ['Card 1', 'Card 2', 'Card 3'], // Example cards
+        };
+        savedDecks.push(deck);
+        alert(`Deck "${deckName}" saved successfully!`);
+        displaySavedDecks();
+        document.body.removeChild(modal);
+      } else {
+        alert('Please enter a deck name.');
+      }
+    });
+  
+    // Create the modal
+    const modal = createModal({
+      titleText: 'Deck Builder',
+      contentElement: form,
+      onClose: () => {
+        console.log('Modal closed');
+      },
+    });
+  }
+
+    // Function to close the modal
+        const closeModal = () => {
+            document.body.removeChild(modal);
+        };
     }
-}
 
 // Function to display saved decks in the UI
 function displaySavedDecks() {
