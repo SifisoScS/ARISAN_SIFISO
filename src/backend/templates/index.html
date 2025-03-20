@@ -30,45 +30,45 @@
 
 <!-- Game Interface -->
 <main>
-  <div class="button-container">
-      <button onclick="startGame()">Start Game</button>
-      <button onclick="drawCard()">Draw Card</button>
-      <button onclick="playCard()">Play Card</button>
-      <!-- Removed the duplicate "Deck Builder" button -->
-  </div>
+    <div class="button-container">
+        <button onclick="startGame()">Start Game</button>
+        <button onclick="drawCard()">Draw Card</button>
+        <button onclick="playCard()">Play Card</button>
+        <!-- Removed the duplicate "Deck Builder" button -->
+    </div>
 
-  <div class="human-player">
-      <h2>Your Hand</h2>
-      <div id="human-player-hand"></div>
-  </div>
-  
-  <p id="success-message" class="hidden">Game reset successfully!</p>
-  <div id="game-results" class="results-container"></div>
+    <div class="human-player">
+        <h2>Your Hand</h2>
+        <div id="human-player-hand"></div>
+    </div>
+    
+    <p id="success-message" class="hidden">Game reset successfully!</p>
+    <div id="game-results" class="results-container"></div>
 
-  <div class="game-dashboard">
-      <div class="game-state">
-          <h2>Game State</h2>
-          <p id="game-state">Waiting to Start</p>
-      </div>
-      <div class="player-hands">
-          <h2>Player Hands</h2>
-          <div id="player-hands"></div>
-      </div>
-      <div class="leaderboard-preview">
-          <h2>Top Players</h2>
-          <div id="leaderboard-preview"></div>
-      </div>
-      <div class="recent-actions">
-          <h2>Recent Actions</h2>
-          <div id="recent-actions"></div>
-      </div>
-      <div class="saved-decks">
-          <h2>Saved Decks</h2>
-          <div id="saved-decks"></div>
-      </div>
-  </div>
+    <div class="game-dashboard">
+        <div class="game-state">
+            <h2>Game State</h2>
+            <p id="game-state">Waiting to Start</p>
+        </div>
+        <div class="player-hands">
+            <h2>Player Hands</h2>
+            <div id="player-hands"></div>
+        </div>
+        <div class="leaderboard-preview">
+            <h2>Top Players</h2>
+            <div id="leaderboard-preview"></div>
+        </div>
+        <div class="recent-actions">
+            <h2>Recent Actions</h2>
+            <div id="recent-actions"></div>
+        </div>
+        <div class="saved-decks">
+            <h2>Saved Decks</h2>
+            <div id="saved-decks"></div>
+        </div>
+    </div>
 
-  <div id="loader" class="loader"></div>
+    <div id="loader" class="loader"></div>
 </main>
 
 <script src="/static/script.js"></script>
